@@ -1,10 +1,10 @@
 # Escape the Strap Rooms: NPC dialogue, draft 3
 
-House style: direct and funny, no em dashes.
-Every line references Girl Trash lyrics, a lesbian culture moment from roughly 2016 to now, or both.
+House style: direct and funny. 
+Some charaters references Girl Trash lyrics, a lesbian pop culture meme culture moment
 No U-Hauls. Polyamory is only Vesper's and Her Own Primary's thing.
 
-Each conversation shows 2 lines. The next time you meet her, she picks up where she left off.
+one line per conversation. The next time you meet her, she picks up where she left off.
 Lines marked (GT) use your Girl Trash lyrics.
 
 ## Named NPCs
