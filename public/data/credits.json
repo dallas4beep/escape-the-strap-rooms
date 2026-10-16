@@ -1,0 +1,45 @@
+{
+ "sections": [
+  {
+   "title": "3D models (CC BY 4.0)",
+   "note": "https://creativecommons.org/licenses/by/4.0/",
+   "items": [
+    "Sploot_alien by Fusty (https://skfb.ly/pMvNL)",
+    "Tank tank base by fluxeion20 (https://sketchfab.com/3d-models/tank-tank-base-1805dfd1b59d4786baf7cad24bea2c7b)",
+    "Toy Boris v1 by 546kost (https://sketchfab.com/3d-models/toy-boris-v1-742487511fc34d61816f794ad140e9c0)",
+    "Project 13 by nxono372 (https://sketchfab.com/3d-models/project-13-b811a9d22a7b4365b30cf303a7b756c1)",
+    "thicc mr sun by bbbake45 (https://sketchfab.com/3d-models/thicc-mr-sun-52951fba62734176bb1cc7eeb913ddf6)",
+    "SUBJECT 7 by nullGTH (https://sketchfab.com/3d-models/subject-7-44f21dd43a3d4f07a37f31558cfb0c00). Based on work by @8BALL. Credit Leomullin5.",
+    "Anime Fish With Legs by Lucky_Duck (https://sketchfab.com/3d-models/anime-fish-with-legs-6d34703a443c4f4e8ff53c612a26bb06)"
+   ]
+  },
+  {
+   "title": "3D models (Sketchfab Standard)",
+   "note": "https://sketchfab.com/licenses",
+   "items": [
+    "Glass Coke Bottle by cereal (https://sketchfab.com/3d-models/glass-coke-bottle-d31259f42ce74b339bff93952640f642)",
+    "Hot Dog by saurabh.buradkar7 (https://sketchfab.com/3d-models/hot-dog-1caa648da7304a36916c2782aad82d6c)"
+   ]
+  },
+  {
+   "title": "2D sprites",
+   "note": "CraftPix.net free licence: https://craftpix.net/file-licenses/",
+   "items": [
+    "Character sprite packs from CraftPix.net (https://craftpix.net/freebies/)"
+   ]
+  },
+  {
+   "title": "Art",
+   "items": [
+    "\"What is solo poly?\" by @marjanilane"
+   ]
+  },
+  {
+   "title": "Software",
+   "items": [
+    "three.js (MIT licence, https://threejs.org)",
+    "Special Elite font by Astigmatic (Apache licence, Google Fonts)"
+   ]
+  }
+ ]
+}

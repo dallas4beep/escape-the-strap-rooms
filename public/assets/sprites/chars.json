@@ -1,0 +1,770 @@
+[
+{
+"id": "amazon-1-amazon-1",
+"file": "chars/amazon-1-amazon-1.webp",
+"frames": 5,
+"w": 101,
+"h": 68,
+"fps": 8
+},
+{
+"id": "amazon-2-amazon-2",
+"file": "chars/amazon-2-amazon-2.webp",
+"frames": 5,
+"w": 67,
+"h": 66,
+"fps": 8
+},
+{
+"id": "amazon-3-amazon-3",
+"file": "chars/amazon-3-amazon-3.webp",
+"frames": 6,
+"w": 81,
+"h": 80,
+"fps": 8
+},
+{
+"id": "the-2d-platformer-ch-customized-character-women-1",
+"file": "chars/the-2d-platformer-ch-customized-character-women-1.webp",
+"frames": 4,
+"w": 55,
+"h": 66,
+"fps": 8
+},
+{
+"id": "the-2d-platformer-ch-customized-character-women-2",
+"file": "chars/the-2d-platformer-ch-customized-character-women-2.webp",
+"frames": 4,
+"w": 55,
+"h": 66,
+"fps": 8
+},
+{
+"id": "the-2d-platformer-ch-customized-character-women-3",
+"file": "chars/the-2d-platformer-ch-customized-character-women-3.webp",
+"frames": 4,
+"w": 55,
+"h": 66,
+"fps": 8
+},
+{
+"id": "free-minotaur-sprite-minotaur-1",
+"file": "chars/free-minotaur-sprite-minotaur-1.webp",
+"frames": 5,
+"w": 128,
+"h": 94,
+"fps": 8
+},
+{
+"id": "free-minotaur-sprite-minotaur-2",
+"file": "chars/free-minotaur-sprite-minotaur-2.webp",
+"frames": 5,
+"w": 124,
+"h": 95,
+"fps": 8
+},
+{
+"id": "free-minotaur-sprite-minotaur-3",
+"file": "chars/free-minotaur-sprite-minotaur-3.webp",
+"frames": 4,
+"w": 119,
+"h": 82,
+"fps": 8
+},
+{
+"id": "vampire-pixel-art-ch-converted-vampire",
+"file": "chars/vampire-pixel-art-ch-converted-vampire.webp",
+"frames": 7,
+"w": 128,
+"h": 78,
+"fps": 8
+},
+{
+"id": "vampire-pixel-art-ch-countess-vampire",
+"file": "chars/vampire-pixel-art-ch-countess-vampire.webp",
+"frames": 7,
+"w": 90,
+"h": 71,
+"fps": 8
+},
+{
+"id": "vampire-pixel-art-ch-vampire-girl",
+"file": "chars/vampire-pixel-art-ch-vampire-girl.webp",
+"frames": 6,
+"w": 73,
+"h": 66,
+"fps": 8
+},
+{
+"id": "free-werewolf-sprite-black-werewolf",
+"file": "chars/free-werewolf-sprite-black-werewolf.webp",
+"frames": 6,
+"w": 98,
+"h": 89,
+"fps": 8
+},
+{
+"id": "free-werewolf-sprite-red-werewolf",
+"file": "chars/free-werewolf-sprite-red-werewolf.webp",
+"frames": 6,
+"w": 98,
+"h": 89,
+"fps": 8
+},
+{
+"id": "free-werewolf-sprite-white-werewolf",
+"file": "chars/free-werewolf-sprite-white-werewolf.webp",
+"frames": 6,
+"w": 98,
+"h": 89,
+"fps": 8
+},
+{
+"id": "free-gorgon-pixel-ar-gorgon-1",
+"file": "chars/free-gorgon-pixel-ar-gorgon-1.webp",
+"frames": 12,
+"w": 118,
+"h": 84,
+"fps": 8
+},
+{
+"id": "free-gorgon-pixel-ar-gorgon-2",
+"file": "chars/free-gorgon-pixel-ar-gorgon-2.webp",
+"frames": 12,
+"w": 118,
+"h": 84,
+"fps": 8
+},
+{
+"id": "free-gorgon-pixel-ar-gorgon-3",
+"file": "chars/free-gorgon-pixel-ar-gorgon-3.webp",
+"frames": 12,
+"w": 118,
+"h": 84,
+"fps": 8
+},
+{
+"id": "pixel-dark-elf-queen-1",
+"file": "chars/pixel-dark-elf-queen-1.webp",
+"frames": 6,
+"w": 53,
+"h": 84,
+"fps": 8
+},
+{
+"id": "pixel-dark-elf-queen-2",
+"file": "chars/pixel-dark-elf-queen-2.webp",
+"frames": 6,
+"w": 79,
+"h": 53,
+"fps": 8
+},
+{
+"id": "golem-character-spri-copper-golem",
+"file": "chars/golem-character-spri-copper-golem.webp",
+"frames": 6,
+"w": 99,
+"h": 59,
+"fps": 8
+},
+{
+"id": "golem-character-spri-lava-golem",
+"file": "chars/golem-character-spri-lava-golem.webp",
+"frames": 5,
+"w": 60,
+"h": 76,
+"fps": 8
+},
+{
+"id": "golem-character-spri-stone-golem",
+"file": "chars/golem-character-spri-stone-golem.webp",
+"frames": 5,
+"w": 122,
+"h": 79,
+"fps": 8
+},
+{
+"id": "free-fantasy-enemies-fire-spirit",
+"file": "chars/free-fantasy-enemies-fire-spirit.webp",
+"frames": 12,
+"w": 63,
+"h": 46,
+"fps": 8
+},
+{
+"id": "free-fantasy-enemies-plent",
+"file": "chars/free-fantasy-enemies-plent.webp",
+"frames": 6,
+"w": 128,
+"h": 58,
+"fps": 8
+},
+{
+"id": "free-fantasy-enemies-skeleton",
+"file": "chars/free-fantasy-enemies-skeleton.webp",
+"frames": 7,
+"w": 108,
+"h": 70,
+"fps": 8
+},
+{
+"id": "free-ninja-sprite-sh-kunoichi",
+"file": "chars/free-ninja-sprite-sh-kunoichi.webp",
+"frames": 6,
+"w": 128,
+"h": 85,
+"fps": 8
+},
+{
+"id": "dark-elf-sprite-pixe-elf-1",
+"file": "chars/dark-elf-sprite-pixe-elf-1.webp",
+"frames": 9,
+"w": 108,
+"h": 70,
+"fps": 8
+},
+{
+"id": "dark-elf-sprite-pixe-elf-2",
+"file": "chars/dark-elf-sprite-pixe-elf-2.webp",
+"frames": 4,
+"w": 117,
+"h": 87,
+"fps": 8
+},
+{
+"id": "dark-elf-sprite-pixe-elf-3",
+"file": "chars/dark-elf-sprite-pixe-elf-3.webp",
+"frames": 4,
+"w": 102,
+"h": 69,
+"fps": 8
+},
+{
+"id": "witch-pixel-characte-witch-1",
+"file": "chars/witch-pixel-characte-witch-1.webp",
+"frames": 8,
+"w": 58,
+"h": 68,
+"fps": 8
+},
+{
+"id": "witch-pixel-characte-witch-2",
+"file": "chars/witch-pixel-characte-witch-2.webp",
+"frames": 5,
+"w": 57,
+"h": 67,
+"fps": 8
+},
+{
+"id": "witch-pixel-characte-witch-3",
+"file": "chars/witch-pixel-characte-witch-3.webp",
+"frames": 8,
+"w": 106,
+"h": 98,
+"fps": 8
+},
+{
+"id": "anime-demon-sprite-s-demon-1",
+"file": "chars/anime-demon-sprite-s-demon-1.webp",
+"frames": 6,
+"w": 95,
+"h": 73,
+"fps": 8
+},
+{
+"id": "anime-demon-sprite-s-demon-2",
+"file": "chars/anime-demon-sprite-s-demon-2.webp",
+"frames": 7,
+"w": 66,
+"h": 70,
+"fps": 8
+},
+{
+"id": "anime-demon-sprite-s-demon-3",
+"file": "chars/anime-demon-sprite-s-demon-3.webp",
+"frames": 9,
+"w": 128,
+"h": 119,
+"fps": 8
+},
+{
+"id": "anime-demon-sprite-s-demon-4",
+"file": "chars/anime-demon-sprite-s-demon-4.webp",
+"frames": 12,
+"w": 79,
+"h": 48,
+"fps": 8
+},
+{
+"id": "bestial-anime-charac-berserk",
+"file": "chars/bestial-anime-charac-berserk.webp",
+"frames": 4,
+"w": 69,
+"h": 83,
+"fps": 8
+},
+{
+"id": "bestial-anime-charac-enchantress",
+"file": "chars/bestial-anime-charac-enchantress.webp",
+"frames": 4,
+"w": 97,
+"h": 77,
+"fps": 8
+},
+{
+"id": "bestial-anime-charac-knight",
+"file": "chars/bestial-anime-charac-knight.webp",
+"frames": 4,
+"w": 128,
+"h": 74,
+"fps": 8
+},
+{
+"id": "fantasy-knight-sprit-knight-1",
+"file": "chars/fantasy-knight-sprit-knight-1.webp",
+"frames": 5,
+"w": 90,
+"h": 64,
+"fps": 8
+},
+{
+"id": "fantasy-knight-sprit-knight-2",
+"file": "chars/fantasy-knight-sprit-knight-2.webp",
+"frames": 5,
+"w": 90,
+"h": 64,
+"fps": 8
+},
+{
+"id": "fantasy-knight-sprit-knight-3",
+"file": "chars/fantasy-knight-sprit-knight-3.webp",
+"frames": 5,
+"w": 90,
+"h": 64,
+"fps": 8
+},
+{
+"id": "free-yokai-pixel-art-karasu-tengu",
+"file": "chars/free-yokai-pixel-art-karasu-tengu.webp",
+"frames": 6,
+"w": 119,
+"h": 87,
+"fps": 8
+},
+{
+"id": "free-yokai-pixel-art-kitsune",
+"file": "chars/free-yokai-pixel-art-kitsune.webp",
+"frames": 10,
+"w": 128,
+"h": 70,
+"fps": 8
+},
+{
+"id": "free-yokai-pixel-art-yamabushi-tengu",
+"file": "chars/free-yokai-pixel-art-yamabushi-tengu.webp",
+"frames": 3,
+"w": 116,
+"h": 87,
+"fps": 8
+},
+{
+"id": "orc-character-sprite-orc-warrior-brown",
+"file": "chars/orc-character-sprite-orc-warrior-brown.webp",
+"frames": 5,
+"w": 106,
+"h": 80,
+"fps": 8
+},
+{
+"id": "orc-character-sprite-orc-warrior-green",
+"file": "chars/orc-character-sprite-orc-warrior-green.webp",
+"frames": 5,
+"w": 106,
+"h": 80,
+"fps": 8
+},
+{
+"id": "orc-character-sprite-orc-woman",
+"file": "chars/orc-character-sprite-orc-woman.webp",
+"frames": 6,
+"w": 70,
+"h": 76,
+"fps": 8
+},
+{
+"id": "demon-sprite-sheet-p-demon-1",
+"file": "chars/demon-sprite-sheet-p-demon-1.webp",
+"frames": 9,
+"w": 54,
+"h": 50,
+"fps": 8
+},
+{
+"id": "demon-sprite-sheet-p-demon-2",
+"file": "chars/demon-sprite-sheet-p-demon-2.webp",
+"frames": 5,
+"w": 99,
+"h": 85,
+"fps": 8
+},
+{
+"id": "demon-sprite-sheet-p-demon-3",
+"file": "chars/demon-sprite-sheet-p-demon-3.webp",
+"frames": 5,
+"w": 73,
+"h": 57,
+"fps": 8
+},
+{
+"id": "city-girl-character-girl-1",
+"file": "chars/city-girl-character-girl-1.webp",
+"frames": 4,
+"w": 46,
+"h": 66,
+"fps": 8
+},
+{
+"id": "city-girl-character-girl-2",
+"file": "chars/city-girl-character-girl-2.webp",
+"frames": 8,
+"w": 56,
+"h": 67,
+"fps": 8
+},
+{
+"id": "city-girl-character-girl-3",
+"file": "chars/city-girl-character-girl-3.webp",
+"frames": 4,
+"w": 58,
+"h": 66,
+"fps": 8
+},
+{
+"id": "free-ghost-pixel-art-gotoku",
+"file": "chars/free-ghost-pixel-art-gotoku.webp",
+"frames": 4,
+"w": 64,
+"h": 76,
+"fps": 8
+},
+{
+"id": "free-ghost-pixel-art-onre",
+"file": "chars/free-ghost-pixel-art-onre.webp",
+"frames": 5,
+"w": 53,
+"h": 70,
+"fps": 8
+},
+{
+"id": "free-ghost-pixel-art-yurei",
+"file": "chars/free-ghost-pixel-art-yurei.webp",
+"frames": 4,
+"w": 63,
+"h": 71,
+"fps": 8
+},
+{
+"id": "wizard-pixel-art-spr-fire-wizard",
+"file": "chars/wizard-pixel-art-spr-fire-wizard.webp",
+"frames": 5,
+"w": 83,
+"h": 88,
+"fps": 8
+},
+{
+"id": "wizard-pixel-art-spr-lightning-mage",
+"file": "chars/wizard-pixel-art-spr-lightning-mage.webp",
+"frames": 4,
+"w": 71,
+"h": 61,
+"fps": 8
+},
+{
+"id": "wizard-pixel-art-spr-wanderer-magican",
+"file": "chars/wizard-pixel-art-spr-wanderer-magican.webp",
+"frames": 6,
+"w": 79,
+"h": 66,
+"fps": 8
+},
+{
+"id": "mimic-2d-pixel-chara-mimic-1",
+"file": "chars/mimic-2d-pixel-chara-mimic-1.webp",
+"frames": 7,
+"w": 73,
+"h": 40,
+"fps": 8
+},
+{
+"id": "mimic-2d-pixel-chara-mimic-2",
+"file": "chars/mimic-2d-pixel-chara-mimic-2.webp",
+"frames": 4,
+"w": 65,
+"h": 65,
+"fps": 8
+},
+{
+"id": "mimic-2d-pixel-chara-mimic-3",
+"file": "chars/mimic-2d-pixel-chara-mimic-3.webp",
+"frames": 7,
+"w": 53,
+"h": 34,
+"fps": 8
+},
+{
+"id": "girls-warrior-2d-pix-girl-1",
+"file": "chars/girls-warrior-2d-pix-girl-1.webp",
+"frames": 4,
+"w": 127,
+"h": 72,
+"fps": 8
+},
+{
+"id": "girls-warrior-2d-pix-girl-2",
+"file": "chars/girls-warrior-2d-pix-girl-2.webp",
+"frames": 4,
+"w": 99,
+"h": 75,
+"fps": 8
+},
+{
+"id": "girls-warrior-2d-pix-girl-3",
+"file": "chars/girls-warrior-2d-pix-girl-3.webp",
+"frames": 4,
+"w": 89,
+"h": 71,
+"fps": 8
+},
+{
+"id": "free-zombie-sprite-s-zombie-woman",
+"file": "chars/free-zombie-sprite-s-zombie-woman.webp",
+"frames": 4,
+"w": 54,
+"h": 63,
+"fps": 8
+},
+{
+"id": "knight-character-spr-knight-1",
+"file": "chars/knight-character-spr-knight-1.webp",
+"frames": 5,
+"w": 86,
+"h": 74,
+"fps": 8
+},
+{
+"id": "knight-character-spr-knight-2",
+"file": "chars/knight-character-spr-knight-2.webp",
+"frames": 5,
+"w": 86,
+"h": 74,
+"fps": 8
+},
+{
+"id": "knight-character-spr-knight-3",
+"file": "chars/knight-character-spr-knight-3.webp",
+"frames": 5,
+"w": 86,
+"h": 74,
+"fps": 8
+},
+{
+"id": "archer-archer-clothes-1",
+"file": "chars/archer-archer-clothes-1.webp",
+"frames": 12,
+"w": 94,
+"h": 128,
+"fps": 12
+},
+{
+"id": "archer-archer-clothes-2",
+"file": "chars/archer-archer-clothes-2.webp",
+"frames": 12,
+"w": 99,
+"h": 128,
+"fps": 12
+},
+{
+"id": "archer-archer-clothes-empty",
+"file": "chars/archer-archer-clothes-empty.webp",
+"frames": 12,
+"w": 92,
+"h": 128,
+"fps": 12
+},
+{
+"id": "tiny-vampire-01",
+"file": "chars/tiny-vampire-01.webp",
+"frames": 12,
+"w": 152,
+"h": 128,
+"fps": 12
+},
+{
+"id": "tiny-vampire-02",
+"file": "chars/tiny-vampire-02.webp",
+"frames": 12,
+"w": 158,
+"h": 128,
+"fps": 12
+},
+{
+"id": "tiny-vampire-03",
+"file": "chars/tiny-vampire-03.webp",
+"frames": 12,
+"w": 154,
+"h": 128,
+"fps": 12
+},
+{
+"id": "monster-1",
+"file": "chars/monster-1.webp",
+"frames": 10,
+"w": 102,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-2",
+"file": "chars/monster-2.webp",
+"frames": 10,
+"w": 92,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-3",
+"file": "chars/monster-3.webp",
+"frames": 10,
+"w": 105,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-4",
+"file": "chars/monster-4.webp",
+"frames": 10,
+"w": 99,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-5",
+"file": "chars/monster-5.webp",
+"frames": 10,
+"w": 89,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-6",
+"file": "chars/monster-6.webp",
+"frames": 10,
+"w": 87,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-7",
+"file": "chars/monster-7.webp",
+"frames": 10,
+"w": 87,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-8",
+"file": "chars/monster-8.webp",
+"frames": 10,
+"w": 146,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-9",
+"file": "chars/monster-9.webp",
+"frames": 10,
+"w": 111,
+"h": 128,
+"fps": 10
+},
+{
+"id": "monster-10",
+"file": "chars/monster-10.webp",
+"frames": 10,
+"w": 105,
+"h": 128,
+"fps": 10
+},
+{
+"id": "tribal-aztec",
+"file": "chars/tribal-aztec.webp",
+"frames": 10,
+"w": 107,
+"h": 128,
+"fps": 12
+},
+{
+"id": "tribal-maya",
+"file": "chars/tribal-maya.webp",
+"frames": 10,
+"w": 114,
+"h": 128,
+"fps": 12
+},
+{
+"id": "tribal-nordic",
+"file": "chars/tribal-nordic.webp",
+"frames": 10,
+"w": 118,
+"h": 128,
+"fps": 12
+},
+{
+"id": "topdown-vampires1",
+"file": "chars/topdown-vampires1.webp",
+"frames": 12,
+"w": 35,
+"h": 46,
+"fps": 8
+},
+{
+"id": "topdown-vampires2",
+"file": "chars/topdown-vampires2.webp",
+"frames": 12,
+"w": 39,
+"h": 48,
+"fps": 8
+},
+{
+"id": "topdown-vampires3",
+"file": "chars/topdown-vampires3.webp",
+"frames": 12,
+"w": 39,
+"h": 48,
+"fps": 8
+},
+{
+"id": "slime-slime1",
+"file": "chars/slime-slime1.webp",
+"frames": 10,
+"w": 63,
+"h": 33,
+"fps": 8
+},
+{
+"id": "slime-slime2",
+"file": "chars/slime-slime2.webp",
+"frames": 11,
+"w": 41,
+"h": 40,
+"fps": 8
+},
+{
+"id": "slime-slime3",
+"file": "chars/slime-slime3.webp",
+"frames": 9,
+"w": 47,
+"h": 53,
+"fps": 8
+}
+]
