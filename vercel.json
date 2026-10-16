@@ -1,5 +1,6 @@
 {
-  "buildCommand": "npm run build",
+  "installCommand": "echo skip",
+  "buildCommand": "echo skip",
   "outputDirectory": "public",
   "headers": [
     {
