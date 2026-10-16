@@ -11,9 +11,9 @@ export const CONFIG = {
   touchLookSensitivity: 0.007,
   maxPitch: 0.6,
 
-  enemySpeed: 2.3,             // slower than the player, so running away works
-  enemyStartDelay: 2.5,        // seconds after the instructions close
-  catchDistance: 0.8,
+  enemySpeed: 1.7,             // well under the player's 3.2, so you can get away
+  enemyStartDelay: 5,          // seconds after the instructions close before she moves
+  catchDistance: 0.65,
   dangerDistance: 6,           // screen shudders inside this
   keyPickupDistance: 1.0,
   sodaPickupDistance: 0.9,
@@ -33,7 +33,6 @@ export const CONFIG = {
     minVolume: 0.06,           // chase song when Community Strap is far away
     maxVolume: 1.0,            // when she is right on top of you
     hearDistance: 28,
-    skitVolume: 0.8,
   },
 
   maxCharacters: 40,           // everyone on the map, Community Strap included
@@ -42,9 +41,12 @@ export const CONFIG = {
 };
 
 export const SPOTS = {
-  start: { pos: [0, 0.4], yaw: Math.PI / 2 },
+  // East end of the long hallway, facing down it. The small room's doorway is a few steps ahead.
+  start: { pos: [5.8, 5.2], yaw: Math.PI },
+  // Where later runs start (after the intro has been seen): partway down the hallway,
+  // with Community Strap well behind you.
+  chaseStart: { pos: [-9.2, 5.2], yaw: Math.PI, strap: [4.0, 5.2] },
   phoneGirl: [-13.2, 5.6],
-  strapIntro: [-32, 5.0],
   key: [-62.5, 12.2],
   exitDoor: [-50.0, -4.1],
   soda: [-23.6, 12.4],

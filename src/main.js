@@ -71,7 +71,7 @@ const state = {
   lastStatus: "",
   time: 0,
 };
-let npcs = [], strap = null, key = null, soda = null, hotdog = null, phoneGirl = null;
+let npcs = [], strap = null, key = null, soda = null, phoneGirl = null;
 let dialogue = null, credits = null;
 
 // ---------- Loading ----------
@@ -91,7 +91,7 @@ async function load() {
   for (const m of models) looks.splice(Math.floor(Math.random() * (looks.length + 1)), 0, { model: m });
 
   const spriteFiles = [...new Set(looks.filter((l) => l.sprite).map((l) => l.sprite.file))];
-  total = 4 + spriteFiles.length + models.length + 6;
+  total = 4 + spriteFiles.length + models.length + 5;
 
   const texCache = {};
   const jobs = [
@@ -103,7 +103,6 @@ async function load() {
   jobs.push(texLoader.loadAsync("assets/img/strap-looks.webp").then((t) => { fixed.strap = t; tick(); }));
   jobs.push(texLoader.loadAsync("assets/img/solo-poly.jpg").then((t) => { t.colorSpace = THREE.SRGBColorSpace; fixed.primary = t; tick(); }));
   jobs.push(texLoader.loadAsync("assets/img/carabiner.webp").then((t) => { fixed.key = t; tick(); }));
-  jobs.push(gltfLoader.loadAsync("assets/models/hotdog.glb").then((g) => { fixed.hotdog = g; tick(); }));
   jobs.push(gltfLoader.loadAsync("assets/models/soda.glb").then((g) => { fixed.soda = g; tick(); }));
   await Promise.all(jobs);
 
@@ -124,8 +123,6 @@ async function load() {
   let li = 0;
   const next = () => make(looks[li++]);
   phoneGirl = addNpc(next(), { kind: "phone", name: "Girl on the phone", at: SPOTS.phoneGirl, wander: 0 });
-  hotdog = A.hotdogProp(fixed.hotdog);
-  scene.add(hotdog);
   SPOTS.djs.forEach((at, i) => addNpc(next(), { kind: "dj", name: "DJ", at, wander: 0, lines: i ? dialogue.djRight : dialogue.djLeft, talkRange: 1.9 }));
   for (const [name, at] of Object.entries(SPOTS.named)) addNpc(next(), { kind: "named", name, at, wander: 1.2, lines: dialogue.named[name] || [] });
   addNpc(A.cardActor(fixed.primary, 1.5), { kind: "primary", name: "Her Own Primary", at: SPOTS.primary, wander: 0, lines: dialogue.primary });
@@ -189,8 +186,9 @@ function randomPointIn(area) {
 // ---------- Starting a run ----------
 function placeForStart() {
   const p = state.player;
-  [p.x, p.z] = SPOTS.start.pos;
-  p.yaw = SPOTS.start.yaw;
+  const spot = state.introDone ? SPOTS.chaseStart : SPOTS.start;
+  [p.x, p.z] = spot.pos;
+  p.yaw = spot.yaw;
   p.pitch = 0;
   state.walked = 0;
   state.hasKey = false;
@@ -201,7 +199,9 @@ function placeForStart() {
   state.fovTarget = CONFIG.fov;
   camera.fov = CONFIG.fov;
   camera.updateProjectionMatrix();
-  [strap.x, strap.z] = SPOTS.strapIntro;
+  // First run: she's hidden until she appears behind you. Later runs: she's already behind you.
+  [strap.x, strap.z] = SPOTS.chaseStart.strap;
+  strap.actor.object.visible = state.introDone;
   strap.active = false;
   strap.elapsed = 0;
   key.object.visible = true;
@@ -224,8 +224,7 @@ function startRun() {
   document.body.classList.add("playing");
   if (!state.introDone) {
     state.phase = "walk";
-    audio.play("skit", { volume: CONFIG.music.skitVolume });
-    setStatus(touch ? "Left thumb to walk. Right thumb to look." : "W A S D or arrow keys to move. Mouse to look.", "neutral");
+    setStatus(touch ? "Left thumb to walk. Right thumb to look." : "W A S D or arrow keys to move. Click, then move the mouse to look.", "neutral");
   } else {
     state.phase = "play";
     startChase();
@@ -235,8 +234,9 @@ function startRun() {
 }
 
 function startChase() {
-  audio.stop("skit");
-  audio.play("chase", { volume: audio.chaseVolumeFor(dist(strap)) });
+  if (!state.chaseMusic) audio.play("chase", { volume: audio.chaseVolumeFor(dist(strap)) });
+  state.chaseMusic = false;
+  strap.actor.object.visible = true;
   strap.active = true;
   strap.elapsed = 0;
   state.lastStatus = "";
@@ -250,58 +250,56 @@ function beginIntroLock() {
   releaseTouches();
   const g = phoneGirl;
   tweenCameraTo(g.x, world.floorY + g.actor.height * 0.8, g.z, 1.2, async () => {
-    audio.setVolume("skit", 0.12, 0.3);
     state.phase = "introVideo";
     await playVideo(videoSrc("intro"), { muted: false, closable: false });
     hideVideo();
-    audio.setVolume("skit", CONFIG.music.skitVolume, 0.3);
     beginPan();
   });
 }
 
-// Look past the phone girl: Community Strap is waiting far away behind her.
+// The camera turns around: Community Strap is behind you. Then it snaps back to face
+// the opposite way, the instructions come up, and the chase song starts with them.
 function beginPan() {
   state.phase = "pan";
   const p = state.player, g = phoneGirl;
   const dx = g.x - p.x, dz = g.z - p.z, len = Math.hypot(dx, dz) || 1;
-  const ux = dx / len, uz = dz / len;
-  // Glide past the girl's shoulder so she doesn't block the view down the room.
-  let move = [p.x, p.z];
-  for (const side of [1, -1]) {
-    const x = p.x + ux * 1.0 - uz * 1.1 * side, z = p.z + uz * 1.0 + ux * 1.1 * side;
-    if (world.canWalk(x, z)) { move = [x, z]; break; }
-  }
-  // Put Community Strap far behind the girl, somewhere the camera sees all of her.
-  const [fx, fz] = move;
+  const bx = -dx / len, bz = -dz / len;           // straight behind the player
   let best = null, bestScore = Infinity;
-  for (let x = -40; x <= 0; x += 0.5) for (let z = -4; z <= 15; z += 0.5) {
-    const dx = x - fx, dz = z - fz, d = Math.hypot(dx, dz);
-    if (d < 12 || d > 30 || !world.canNav(x, z)) continue;
-    const ang = Math.abs(angleDiff(Math.atan2(uz, ux), Math.atan2(dz, dx)));
-    if (ang > 0.45) continue;
-    const px = -dz / d * 0.5, pz = dx / d * 0.5;
-    if (!world.clearLine(fx, fz, x, z) || !world.clearLine(fx, fz, x + px, z + pz) || !world.clearLine(fx, fz, x - px, z - pz)) continue;
-    const score = ang * 10 + Math.abs(d - 20) * 0.2;
+  for (let x = p.x - 18; x <= p.x + 18; x += 0.5) for (let z = p.z - 18; z <= p.z + 18; z += 0.5) {
+    const ox = x - p.x, oz = z - p.z, d = Math.hypot(ox, oz);
+    if (d < 9 || d > 16 || !world.canNav(x, z)) continue;
+    const ang = Math.abs(angleDiff(Math.atan2(bz, bx), Math.atan2(oz, ox)));
+    if (ang > 0.6) continue;
+    const px = -oz / d * 0.5, pz = ox / d * 0.5;
+    if (!world.clearLine(p.x, p.z, x, z) || !world.clearLine(p.x, p.z, x + px, z + pz) || !world.clearLine(p.x, p.z, x - px, z - pz)) continue;
+    const score = ang * 10 + Math.abs(d - 12) * 0.3;
     if (score < bestScore) { bestScore = score; best = [x, z]; }
   }
-  if (best) [strap.x, strap.z] = best;
-  strap.actor.setExtra(0.5);
-  state.fovTarget = 30;
-  tweenCameraTo(strap.x, world.floorY + 1.3, strap.z, 2.6, () => {
-    setTimeout(async () => {
-      state.phase = "dangerVideo";
-      unlockPointer();
-      await playVideo(videoSrc("danger"), { muted: true, closable: true });
-      hideVideo();
-      strap.actor.setExtra(0);
+  [strap.x, strap.z] = best || SPOTS.chaseStart.strap;
+  strap.actor.object.visible = true;
+  strap.actor.setExtra(0.6);
+  state.fovTarget = 42;
+  tweenCameraTo(strap.x, world.floorY + 1.3, strap.z, 1.8, () => {
+    setTimeout(() => {
+      // Face the exact opposite way: away from her.
+      const ax = p.x - (strap.x - p.x), az = p.z - (strap.z - p.z);
       state.fovTarget = CONFIG.fov;
-      state.introDone = true;
-      state.phase = "play";
-      input.enabled = true;
-      lockPointer(renderer.domElement);
-      startChase();
-    }, 1300);
-  }, move);
+      tweenCameraTo(ax, world.floorY + CONFIG.eyeHeight, az, 1.1, async () => {
+        state.phase = "dangerVideo";
+        unlockPointer();
+        audio.play("chase", { volume: audio.chaseVolumeFor(dist(strap)) });
+        state.chaseMusic = true;
+        await playVideo(videoSrc("danger"), { muted: true, closable: true });
+        hideVideo();
+        strap.actor.setExtra(0);
+        state.introDone = true;
+        state.phase = "play";
+        input.enabled = true;
+        lockPointer(renderer.domElement);
+        startChase();
+      });
+    }, 1200);
+  });
 }
 
 // ---------- Video overlay ----------
@@ -441,12 +439,6 @@ function updateNpcs(dt, frozen) {
     else if (n.goal) n.actor.face(n.goal[0], n.goal[1]);
     n.actor.object.position.set(n.x, world.floorY, n.z);
     n.actor.update(dt);
-  }
-  // The phone girl holds the hot dog to her ear.
-  if (phoneGirl && hotdog) {
-    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
-    hotdog.position.set(phoneGirl.x + right.x * 0.22, world.floorY + phoneGirl.actor.height * 0.84, phoneGirl.z + right.z * 0.22);
-    hotdog.quaternion.copy(camera.quaternion);
   }
 }
 

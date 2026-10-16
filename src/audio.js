@@ -25,7 +25,6 @@ function track(name, src) {
 export function unlock(video) {
   if (!ctx) {
     try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ctx = null; }
-    track("skit", "assets/audio/skit.mp3");
     track("chase", "assets/audio/chase.mp3");
   }
   if (ctx && ctx.state === "suspended") ctx.resume();

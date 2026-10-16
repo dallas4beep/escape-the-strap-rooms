@@ -167,20 +167,6 @@ export function strapActor(texture, rects, atlasW, atlasH, height) {
   };
 }
 
-// ---------- Flat hot dog held up like a phone ----------
-export function hotdogProp(gltf) {
-  const obj = gltf.scene.clone();
-  obj.traverse((o) => { if (o.isMesh) o.material = new THREE.MeshBasicMaterial({ color: 0xffe100, side: THREE.DoubleSide }); });
-  const box = new THREE.Box3().setFromObject(obj), size = box.getSize(new THREE.Vector3());
-  const s = 0.3 / Math.max(size.x, size.y);
-  const center = box.getCenter(new THREE.Vector3());
-  obj.position.set(-center.x * s, -center.y * s, -center.z * s);
-  obj.scale.setScalar(s);
-  const holder = new THREE.Group();
-  holder.add(obj);
-  return holder;
-}
-
 // ---------- The key: animated carabiner (5 x 5 frame sheet) ----------
 export function keyProp(texture) {
   pixelTexture(texture);
