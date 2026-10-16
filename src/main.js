@@ -250,6 +250,8 @@ function beginIntroLock() {
   releaseTouches();
   const g = phoneGirl;
   tweenCameraTo(g.x, world.floorY + g.actor.height * 0.8, g.z, 1.2, async () => {
+    // Her phone rings first, then the texts come up.
+    await audio.playOnce("ring");
     state.phase = "introVideo";
     await playVideo(videoSrc("intro"), { muted: false, closable: false });
     hideVideo();

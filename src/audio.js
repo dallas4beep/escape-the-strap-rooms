@@ -4,9 +4,9 @@ import { CONFIG } from "./config.js";
 let ctx = null;
 const tracks = {};
 
-function track(name, src) {
+function track(name, src, loop = true) {
   const el = new Audio(src);
-  el.loop = true;
+  el.loop = loop;
   el.preload = "auto";
   el.setAttribute("playsinline", "");
   const t = { el, gain: null };
@@ -25,6 +25,7 @@ export function unlock(video) {
   if (!ctx) {
     try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ctx = null; }
     track("chase", "assets/audio/chase.mp3");
+    track("ring", "assets/audio/ring.mp3", false);
   }
   if (ctx && ctx.state === "suspended") ctx.resume();
 
@@ -60,6 +61,19 @@ export function stop(name) {
   if (!t) return;
   t.wanted = false;
   t.el.pause();
+}
+
+// Play a sound once and resolve when it finishes (or after maxSeconds, whichever is first).
+export function playOnce(name, maxSeconds = 6) {
+  return new Promise((resolve) => {
+    const t = tracks[name];
+    if (!t) { resolve(); return; }
+    let done = false;
+    const finish = () => { if (done) return; done = true; t.wanted = false; resolve(); };
+    t.el.addEventListener("ended", finish, { once: true });
+    setTimeout(finish, maxSeconds * 1000);
+    play(name, { volume: 1 });
+  });
 }
 
 export function stopAll() { for (const n in tracks) stop(n); }
