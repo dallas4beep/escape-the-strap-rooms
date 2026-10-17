@@ -76,7 +76,7 @@ const state = {
   accost: null,               // the NPC storming up to Community Strap right now
 };
 let npcs = [], strap = null, key = null, soda = null, phoneGirl = null;
-let rushers = [], extraLooks = [], hole = null, makeActor = null;
+let rushers = [], extraLooks = [], hole = null, makeActor = null, guide = null;
 let dialogue = null, credits = null;
 
 // ---------- Loading ----------
@@ -142,6 +142,8 @@ async function load() {
   hole = new THREE.Sprite(new THREE.SpriteMaterial({ map: blackHole(), transparent: true, depthWrite: false }));
   hole.visible = false;
   scene.add(hole);
+
+  guide = world.guideArrows(SPOTS.start.pos[0], SPOTS.start.pos[1], SPOTS.key[0], SPOTS.key[1]);
 
   key = A.keyProp(fixed.key);
   scene.add(key.object);
@@ -221,6 +223,7 @@ function placeForStart() {
   strap.active = false;
   strap.elapsed = 0;
   key.object.visible = true;
+  guide.visible = true;
   key.object.position.set(SPOTS.key[0], world.floorY, SPOTS.key[1]);
   // The soda only appears when the stall bursts open.
   soda.object.visible = false;
@@ -697,6 +700,7 @@ function checkEvents() {
   const p = state.player;
   if (key.object.visible && Math.hypot(p.x - SPOTS.key[0], p.z - SPOTS.key[1]) < CONFIG.keyPickupDistance) {
     key.object.visible = false;
+    guide.visible = false;
     state.hasKey = true;
   }
   if (soda.object.visible && state.sodaAt && Math.hypot(p.x - state.sodaAt[0], p.z - state.sodaAt[1]) < CONFIG.sodaPickupDistance) {
@@ -725,7 +729,7 @@ function endRun(how) {
 function updateStatus() {
   const p = state.player;
   if (state.rush > 0) return setStatus(`SUGAR RUSH: ${Math.ceil(state.rush)}s. Nothing can catch you.`, "rush");
-  let msg = state.hasKey ? "Carabiner found. Get to the exit door." : "Find the carabiner.";
+  let msg = state.hasKey ? "Carabiner found. Get to the exit door." : "Find the carabiner. Follow the pink arrows.";
   let tone = state.hasKey ? "good" : "neutral";
   if (!state.hasKey && Math.hypot(p.x - SPOTS.exitDoor[0], p.z - SPOTS.exitDoor[1]) < 2.2) { msg = "The door is locked. Find the carabiner."; tone = "bad"; }
   if (state.stall === "closed" && inBathroom(p)) { msg = "Do you hear that noise coming from the bathroom stall?"; tone = "neutral"; }
@@ -819,4 +823,4 @@ load().catch((e) => { $("loading-text").textContent = "Couldn't load the game. R
 requestAnimationFrame(loop);
 
 // Test builds only (removed from the real build).
-if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
+if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { get guide() { return guide; }, state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };

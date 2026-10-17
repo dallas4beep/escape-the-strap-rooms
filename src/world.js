@@ -121,7 +121,7 @@ export class World {
 
   buildNav() {
     const g = this.grid;
-    this.nCell = 0.2;
+    this.nCell = g.cell * 2;   // two wall-map cells per step, so it covers the whole (scaled) map
     this.nW = Math.floor(g.width / 2);
     this.nH = Math.floor(g.height / 2);
     this.nBlocked = new Uint8Array(this.nW * this.nH);
@@ -173,6 +173,48 @@ export class World {
     if (best < 0) return null;
     const g = this.grid;
     return [g.originX + (bx + 0.5) * this.nCell, g.originZ + (bz + 0.5) * this.nCell];
+  }
+
+  // Glowing floor arrows along the walking route from (ax, az) to (bx, bz).
+  guideArrows(ax, az, bx, bz) {
+    const field = new Int32Array(this.nW * this.nH);
+    this.updateFlow(bx, bz, field);
+    const pts = [[ax, az]];
+    let x = ax, z = az;
+    for (let i = 0; i < 5000; i++) {
+      const s = this.flowStep(x, z, field);
+      if (!s || (s[0] === x && s[1] === z)) break;
+      [x, z] = s;
+      pts.push(s);
+    }
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const g = c.getContext("2d");
+    g.shadowColor = "#ff4fa3";
+    g.shadowBlur = 16;
+    g.strokeStyle = "#ffc2e0";
+    g.lineWidth = 16;
+    g.lineCap = g.lineJoin = "round";
+    for (const y0 of [70, 104]) { g.beginPath(); g.moveTo(26, y0); g.lineTo(64, y0 - 44); g.lineTo(102, y0); g.stroke(); }
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+    const geo = new THREE.PlaneGeometry(1.2, 1.2);
+    const group = new THREE.Group();
+    let run = 2.5;
+    for (let i = 1; i < pts.length - 4; i++) {
+      run += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      if (run < 4) continue;
+      run = 0;
+      const ahead = pts[Math.min(i + 4, pts.length - 1)], behind = pts[i - 1];
+      const m = new THREE.Mesh(geo, mat);
+      m.rotation.set(-Math.PI / 2, Math.atan2(-(ahead[0] - behind[0]), -(ahead[1] - behind[1])), 0, "YXZ");
+      m.position.set(pts[i][0], this.floorY + 0.03, pts[i][1]);
+      group.add(m);
+    }
+    this.scene.add(group);
+    this.updaters.push((t) => { mat.opacity = 0.8 + 0.2 * Math.sin(t * 4); });
+    return group;
   }
 
   // ---------- Club props ----------
@@ -249,8 +291,14 @@ export class World {
     this.blockRect(B.doorTo, z0 - 0.08, x1, z0 + 0.08);
 
     // West wall (new) and tile covers over the level's own east and south walls.
-    this.plane(d, WALL_H, tile(d), x0, mid, z0 + d / 2, Math.PI / 2);
-    this.blockRect(x0 - 0.08, z0, x0 + 0.08, z1);
+    // It has a second doorway: this side is the only way through to the west half
+    // of the club, so the route to the carabiner and the exit runs through here.
+    const wFrom = z1 - 4.0, wTo = z1 - 2.2, sA = wFrom - z0, sB = z1 - wTo, wl = wTo - wFrom;
+    this.plane(sA, WALL_H, tile(sA), x0, mid, z0 + sA / 2, Math.PI / 2);
+    this.plane(sB, WALL_H, tile(sB), x0, mid, wTo + sB / 2, Math.PI / 2);
+    this.plane(wl, 0.35, tile(wl), x0, y + WALL_H - 0.175, wFrom + wl / 2, Math.PI / 2);
+    this.blockRect(x0 - 0.08, z0, x0 + 0.08, wFrom);
+    this.blockRect(x0 - 0.08, wTo, x0 + 0.08, z1);
     this.plane(d, WALL_H, tile(d), x1 - 0.03, mid, z0 + d / 2, -Math.PI / 2);
     this.plane(w, WALL_H, tile(w), x0 + w / 2, mid, z1 - 0.03, Math.PI);
 

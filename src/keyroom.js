@@ -130,6 +130,30 @@ function wallpaper() {
   return t;
 }
 
+function neonSign() {
+  const c = document.createElement("canvas");
+  c.width = 512;
+  c.height = 148;
+  const g = c.getContext("2d");
+  g.fillStyle = "rgba(10,4,20,0.92)";
+  g.fillRect(0, 0, 512, 148);
+  g.strokeStyle = "#5ff0ff";
+  g.lineWidth = 4;
+  g.shadowColor = "#5ff0ff";
+  g.shadowBlur = 12;
+  g.strokeRect(8, 8, 496, 132);
+  g.font = "bold 64px 'Bebas Neue', Impact, sans-serif";
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  g.shadowColor = "#ff4fa3";
+  g.shadowBlur = 22;
+  g.fillStyle = "#ffd1e8";
+  g.fillText("CARABINER \u2192", 256, 78);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 function glowTexture() {
   const c = document.createElement("canvas");
   c.width = c.height = 128;
@@ -209,6 +233,35 @@ export function buildKeyRoom(world) {
   world.blockRect(x1 - 0.08, z0, x1 + 0.08, R.doorFrom);
   world.blockRect(x1 - 0.08, R.doorTo, x1 + 0.08, z1);
   world.blockRect(x0, z1 - 0.08, x1, z1 + 0.08);
+
+  // Neon outside so nobody walks past it: pink trim, a cyan door frame, a lit sign,
+  // and light spilling out of the doorway.
+  const pink = new THREE.MeshBasicMaterial({ color: 0xff4fa3 });
+  const cyan = new THREE.MeshBasicMaterial({ color: 0x5ff0ff });
+  const bar = (sx, sy, sz, mat, px, py, pz) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
+    m.position.set(px, py, pz);
+    scene.add(m);
+  };
+  const doorTop = top - 0.4, dm = (R.doorFrom + R.doorTo) / 2;
+  bar(0.06, 0.06, d, pink, x1 + 0.07, top - 0.06, z0 + d / 2);
+  bar(0.06, 0.06, d, pink, x1 + 0.07, y + 0.06, z0 + d / 2);
+  bar(w, 0.06, 0.06, pink, x0 + w / 2, top - 0.06, z1 + 0.07);
+  bar(w, 0.06, 0.06, pink, x0 + w / 2, y + 0.06, z1 + 0.07);
+  bar(0.06, doorTop - y, 0.06, cyan, x1 + 0.07, (y + doorTop) / 2, R.doorFrom);
+  bar(0.06, doorTop - y, 0.06, cyan, x1 + 0.07, (y + doorTop) / 2, R.doorTo);
+  bar(0.06, 0.06, R.doorTo - R.doorFrom, cyan, x1 + 0.07, doorTop, dm);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.75), new THREE.MeshBasicMaterial({ map: neonSign(), transparent: true }));
+  sign.rotation.y = Math.PI / 2;
+  sign.position.set(x1 + 0.08, y + 1.55, R.doorTo + 1.7);
+  scene.add(sign);
+  const spill = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 3.6),
+    new THREE.MeshBasicMaterial({ map: glowTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8 }));
+  spill.rotation.x = -Math.PI / 2;
+  spill.position.set(x1 + 1.4, y + 0.05, dm);
+  scene.add(spill);
+  // The sign buzzes and flickers now and then.
+  world.updaters.push(() => { sign.material.opacity = Math.random() < 0.03 ? 0.35 : 1; });
 
   // A pool of light on the floor where the carabiner floats.
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2),
