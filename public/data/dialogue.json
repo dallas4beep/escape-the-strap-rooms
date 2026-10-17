@@ -1,64 +1,12 @@
 {
- "named": {
-  "Vesper Sin": [
-   "Hi! My polycule is an open relationship with half the population. We have a shared calendar. It's colour coded.",
-   "We all met at the first ClexaCon. Three of us cried at the same Lexa panel. That's basically a contract.",
-   "Want to be our fourth? Raise your hand. No, higher. The vibe is the Silk Chiffon music video.",
-   "Both my partners use the sunset lesbian flag as their wallpaper. I'm the lock screen.",
-   "My partner just texted \"girl where are you.\" I'm like a block away. Don't go anywhere."
-  ],
-  "Sloane Venom": [
-   "Please don't say her name. Community Strap is in a league of her own, and that league dumped me.",
-   "She ended things mid set. I was holding a tambourine. I kept playing. Very boygenius of me, if boygenius were one sad person.",
-   "Drunken stumbling home every night since, singing \"I can't forget you\" at the bus stop. Twice. It's the chorus.",
-   "She texted \"hope you're well\" the same week as the Arcane season two finale. Who does that.",
-   "I'm going to stand here like the last shot of Portrait of a Lady on Fire and stare at the dance floor until I feel something."
-  ],
-  "Roxanne Riot": [
-   "Guess who's here. No, guess. Fine, I'll tell you. Community Strap. You should probably start running.",
-   "Someone threw their phone at the bouncer earlier. He chased them and they jumped over the counter. It was me. I'm the someone.",
-   "Sloane says she'll be over Community Strap by Lesbian Visibility Week. That's in April. Sloane will not be over it.",
-   "My ex started a podcast about the Lesbian Bar Project. Love that for the bars. Hate that for me.",
-   "Did you see Chappell Roan wore armor at the VMAs? I'm wearing armor tonight. Emotionally."
-  ],
-  "Jade Thunder": [
-   "See the two DJs? Both my exes. Tonight I'm making them each other's exes too.",
-   "My last relationship ended like Bottoms. Fight club, bruises, great cardio, no lessons learned.",
-   "Watch your mouth around those two or it'll get nasty. I mean me. I'll get nasty.",
-   "Healing is going great. I rewatched the Last of Us mall episode and only cried at the photo booth. Twice.",
-   "Okay, I'm leaving dramatically. Kristen Stewart on SNL energy. Like, so gay, dude. Watch me go."
-  ],
-  "Mercedes Velour": [
-   "I keep my love life in a spreadsheet, like Anne Lister kept her diary. In code. Wearing a top hat.",
-   "There's a column for \"do they wear a lot of Ed Hardy.\" It's a dealbreaker column. It is also full.",
-   "There's a tab named Sloane. Don't open it. It's just the Silk Chiffon video and the word \"why.\"",
-   "I'm not sad. I'm in my Lesbian Jesus era. Hayley Kiyoko, not the other one.",
-   "Tell Jade I said hi. No, don't. She'll turn it into a whole Killing Eve thing."
-  ],
-  "Blaze Kowalski": [
-   "Everyone's in a group chat about the boygenius Rolling Stone cover. I'm not in it. I'm the one who pointed out it's a Nirvana reference.",
-   "I told Vesper I'm monogamous. She said that's very A League of Their Own. I said no, I'm in a league of my own.",
-   "I don't need closure. I need Community Strap to stop liking my posts during the Women's World Cup.",
-   "Quick question. If your ex shows up dressed as Vi from Arcane, are you allowed to be mad at how good it looks?",
-   "Do you always hang with girls this trashy? Asking because Roxanne just waved at me."
-  ],
-  "Scarlet Static": [
-   "Hi, I'm Scarlet. I'm the ex. Yes, all of them. I think I slept with you. Let's rewind.",
-   "I've broken up with someone at every Dyke March in this city. It's a tradition. I bring snacks.",
-   "I slept with Julia Fox. You think I'm lying? You think I'm lying.",
-   "Sloane still watches my stories and never likes them. Very Villanelle of her.",
-   "Do you want to come home with me tonight? I don't really have a place, but we can feel the vibe."
-  ]
- },
+ "named": {},
  "primary": [
   "Solo poly means I'm my own primary. I take myself to every Chappell Roan show. I always get the good spot.",
-  "I'm in an open relationship with all of the population. Mostly myself. I'm very committed.",
-  "The relationship escalator is broken. I took the stairs like Anne Lister. Top hat, no ring."
+  "I'm in an open relationship with all of the population. Mostly myself. I'm kinda in a league of my own."
  ],
  "djLeft": [
-  "No requests. Unless it's HOT TO GO. Then fine, but everyone does the arms.",
-  "Raise your hand if your brain is fried. Okay. Everyone. Great. Next track.",
-  "There's a little Pynk by Janelle Monáe under this mix. If you heard it, no you didn't."
+  "No requests. Unless it's SANTA'S COOKIES. Then fine, but everyone does the \"Milky Cookie\" dance.",
+  "Raise your hand if your brain is fried!"
  ],
  "djRight": [
   "This whole set is songs that remind me of people who blocked me. So, mostly MUNA.",
@@ -67,23 +15,40 @@
  ],
  "crowd": [
   "The bathroom's locked and there's thirty of us in here. Nobody knows who locked it. Nobody's leaving.",
-  "Is this the bathroom line or a Bottoms fight club? Both have the same energy.",
-  "My date and I both came as Vi from Arcane. One of us has to be Caitlyn. We're settling it with rock paper scissors.",
-  "The sunset lesbian flag colours are the only thing holding this outfit together.",
-  "I gave a speech about Lexa in this mirror in 2016. I'm still taking questions.",
-  "My ex wore the Gentleman Jack top hat tonight. I can't forget you. I mean the hat. I can't forget the hat.",
-  "Someone asked if I listen to girl in red. I said who doesn't. She said exactly. I think I'm in a band now.",
-  "The Lesbian Bar Project said support your local bar. I'm supporting it. From this stall.",
-  "I've seen the Last of Us mall episode four times. I'm still not okay about the photo booth.",
-  "My situationship is in her Love Lies Bleeding era. Very buff. Very bad decisions.",
-  "We were going to be the next Tegan and Sara. Then we found out we can't both be Sara.",
-  "Hannah Gadsby said a good story needs tension and release. My release is this sink.",
+  "Is this the bathroom line or a TELFAR drop line?",
+  "My wife and I can't agree on so many things. We're tried settling shit with rock paper scissors. But we always just end up scissoring.",
+  "I'm still taking questions.",
+  "I can forget her. I just can't forget her cute puppy.",
+  "I just made out with Angie. I think I'm in the band now.",
   "Someone in here says she slept with Bella Hadid. Do you think she's lying? She's lying.",
   "Do you go to a lot of parties? Because I've seen you at every party. Every single one.",
-  "Someone started the Megan Rapinoe pose by the sinks and now nobody can reach the soap.",
-  "I almost married Community Strap. She's in a league of her own. Everyone in this bathroom almost married her.",
+  "I almost married Community Strap. Everyone in the bathroom almost married her.",
   "Is that the Girl Trash remix? Oh no. That means she's close.",
-  "Someone in the stall said it was the smallest line she's ever seen. Like a whisper or a dream. Anyway, the soap's out."
+  "Swhy are they all hooing the bathroom fighting oversmallest line I've ever seen. Like a whisper or a dream. Anyway, the soap's out.",
+  "Hi! My polycule is an open relationship with half the population. We have a shared calendar. It's colour coded.",
+  "We all met at the first ClexaCon. Three of us cried at the same Lexa panel. That's basically a contract.",
+  "My partner just texted \"girl where are you.\" I'm like a block away. Don't go anywhere.",
+  "Please don't say her name. Community Strap broke my heart. I thought she was going to break my b*$$y.",
+  "She ended things during the Two Headed Girl set. Right after they sang \"Believe It\".",
+  "This trashy ass girl is drunk and stumbling home every night.",
+  "I'm going to stand here stare at the dance floor until I feel something.",
+  "Guess who's here. No, guess. Fine, I'll tell you. Community Strap. You should probably start running.",
+  "Someone threw their phone at the bouncer earlier. He chased them and they jumped over the counter.",
+  "Not me getting ghosted by Community Strap before GTA 6.",
+  "My ex started a podcast. Hate that for me.",
+  "See the two DJs? Both my exes. Tonight I'm making them each other's exes too.",
+  "Watch your mouth cuz those I'm about to get nasty.",
+  "Okay, I'm leaving dramatically. I have to close my tab first.",
+  "me and my polycule saw you from across the bar. We fucking hate your vibe.",
+  "I just found out that my polycule is in a Discord group. I'm not in it.",
+  "I don't need closure. I need Community Strap to stop liking my posts.",
+  "Do you always hang with girls this trashy?",
+  "My exes are here. Yes, all of them. Everyone here. I think I slept with you.",
+  "I break up with someone at every Dyke March in this city. It's a tradition. I bring snacks.",
+  "I slept with Julia Fox. You think I'm lying? You think I'm lying.",
+  "Community Strap still watches my stories and never likes them.",
+  "Do you want to come home with me tonight? I don't really have a place, but we can feel the vibe.",
+  "It's FRIDAY! WHeRe iS your mask you MONSTER?"
  ],
  "accost": [
   "You broke my heart.",
@@ -100,7 +65,7 @@
   "Threw your phone at the bouncer!",
   "Do you wear a lot of Ed Hardy?",
   "I slept with Bella Hadid.",
-  "Let's rewind."
+  "Want to be our fourth?"
  ],
  "sock": "How you gonna ghost me and then pull up to my DJ set?"
 }

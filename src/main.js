@@ -133,7 +133,8 @@ async function load() {
   // Sock: walking down the start hallway toward you. Passing them sets off the intro.
   phoneGirl = addNpc(next(), { kind: "sock", name: "Sock", at: SPOTS.phoneGirl, wander: 0, lines: [] });
   SPOTS.djs.forEach((at, i) => addNpc(next(), { kind: "dj", name: "DJ", at, wander: 0, lines: i ? dialogue.djRight : dialogue.djLeft, talkRange: 1.9 }));
-  for (const [name, at] of Object.entries(SPOTS.named)) addNpc(next(), { kind: "named", name, at, wander: 1.2, lines: dialogue.named[name] || [] });
+  // The old named regulars' spots are just patrons now, using the crowd lines.
+  for (const at of Object.values(SPOTS.named)) addNpc(next(), { kind: "crowd", name: "Patron", at, wander: 1.2 });
   addNpc(A.cardActor(fixed.primary, 1.5), { kind: "primary", name: "Her Own Primary", at: SPOTS.primary, wander: 0, lines: dialogue.primary });
   const df = SPOTS.danceFloor;
   for (let i = 0; i < CONFIG.danceCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone on the dance floor", area: { min: [df.min[0] + 0.6, df.min[1] + 1.2], max: [df.max[0] - 0.6, df.max[1] - 0.4] } });
@@ -495,7 +496,7 @@ function updateNpcs(dt, frozen) {
 
 // ---------- Dialogue ----------
 function startTalk(n) {
-  state.dialogue = { npc: n, pages: 2 };
+  state.dialogue = { npc: n, pages: 1 };   // one line per chat; next time, the next line
   document.body.classList.add("talking");
   input.onTap = advanceTalk;
   releaseTouches();
