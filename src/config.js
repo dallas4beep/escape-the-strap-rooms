@@ -1,6 +1,10 @@
 // Tuning and map positions. Positions are [x, z] in metres on the Backrooms level.
 // The level runs roughly from x -70 (lounge, far west) to x +7 (end of the corridor).
 
+// Phones and tablets get a smaller crowd so they stay smooth.
+const PHONE = typeof navigator !== "undefined" && navigator.maxTouchPoints > 0 &&
+  typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches;
+
 export const CONFIG = {
   mapScale: 1.6,               // the whole level is stretched this much in width and length
   eyeHeight: 1.55,
@@ -46,7 +50,7 @@ export const CONFIG = {
     hearDistance: 28,
   },
 
-  maxCharacters: 60,           // everyone on the map, Community Strap included
+  maxCharacters: PHONE ? 40 : 60,   // everyone on the map, Community Strap included (fewer on phones)
   hallwayCrowd: 4,             // patrons in the start hallway besides Sock
   scatterSpacing: 3,           // how far apart the patrons spread through the rest of the club
   danceCrowd: 6,
