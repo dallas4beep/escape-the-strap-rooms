@@ -37,7 +37,7 @@ Each random character gets 2 of these.
 
 1. (GT) The bathroom's locked and there's thirty of us in here. Nobody knows who locked it. Nobody's leaving.
 2. Is this the bathroom line or a TELFAR drop line? 
-3. My wife and I can't agree on so many things. We're tried settling shit with rock paper scissors. But we always just end up scissoring.
+3. My wife and I can't agree on so many things. We've tried settling shit with rock paper scissors. But we always just end up scissoring.
 5. I'm still taking questions.
 6. (GT) I can forget her. I just can't forget her cute puppy.
 7. I just made out with Angie. I think I'm in the band now.
@@ -45,7 +45,7 @@ Each random character gets 2 of these.
 14. (GT) Do you go to a lot of parties? Because I've seen you at every party. Every single one.
 16. (GT) I almost married Community Strap. Everyone in the bathroom almost married her.
 17. (GT) Is that the Girl Trash remix? Oh no. That means she's close.
-18. (GT) Swhy are they all hooing the bathroom fighting oversmallest line I've ever seen. Like a whisper or a dream. Anyway, the soap's out.
+18. (GT) Why are they all hogging the bathroom fighting over the smallest line I've ever seen? Like a whisper or a dream. Anyway, the soap's out.
 19. (GT) Hi! My polycule is an open relationship with half the population. We have a shared calendar. It's colour coded.
 20. We all met at the first ClexaCon. Three of us cried at the same Lexa panel. That's basically a contract.
 21. (GT) My partner just texted "girl where are you." I'm like a block away. Don't go anywhere.
@@ -58,7 +58,7 @@ Each random character gets 2 of these.
 28. Not me getting ghosted by Community Strap before GTA 6. 
 29. My ex started a podcast. Hate that for me.
 30. See the two DJs? Both my exes. Tonight I'm making them each other's exes too.
-31. Watch your mouth cuz those I'm about to get nasty. 
+31. Watch your mouth cuz I'm about to get nasty. 
 32. Okay, I'm leaving dramatically. I have to close my tab first.
 33. me and my polycule saw you from across the bar. We fucking hate your vibe.
 34. I just found out that my polycule is in a Discord group. I'm not in it.
