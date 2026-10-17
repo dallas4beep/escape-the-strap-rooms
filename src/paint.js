@@ -1,4 +1,4 @@
-// Textures painted on canvases at startup: bathroom tiles, mirrors, stalls,
+// Textures painted on canvases at startup: bathroom tiles, mirrors,
 // the DJ booth front, the checkerboard floor and the disco ball.
 import * as THREE from "three";
 
@@ -69,30 +69,6 @@ export function mirrorWall() {
     g.arc(S - 26, 30, 6, Math.PI, 0);
     g.lineTo(S - 32, 44);
     g.closePath();
-    g.stroke();
-  }));
-}
-
-export function stallDoor(busy) {
-  return toTexture(canvas(128, 128, (g, S) => {
-    g.fillStyle = "#6e4a62";
-    g.fillRect(0, 0, S, S);
-    g.fillStyle = "#c58fb0";
-    g.fillRect(6, 6, S - 12, S - 12);
-    g.fillStyle = "rgba(255,255,255,0.18)";
-    g.fillRect(10, 10, 6, S - 20);
-    g.fillStyle = "rgba(0,0,0,0.18)";
-    g.fillRect(S - 16, 10, 6, S - 20);
-    g.fillStyle = busy ? "#e8304a" : "#3ad46a";
-    g.fillRect(S - 30, S / 2 - 6, 14, 8);
-    g.fillStyle = "#d8d8e0";
-    g.fillRect(8, 18, 4, 10);
-    g.fillRect(8, S - 30, 4, 10);
-    g.strokeStyle = "#2a1240";
-    g.lineWidth = 2;
-    g.beginPath();
-    g.moveTo(30, 34); g.lineTo(40, 26); g.lineTo(46, 38); g.lineTo(56, 28);
-    g.moveTo(30, 48); g.lineTo(70, 48);
     g.stroke();
   }));
 }

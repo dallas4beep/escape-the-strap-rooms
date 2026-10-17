@@ -262,20 +262,38 @@ export class World {
     for (let z = sinkFrom + 0.4; z < sinkTo; z += 0.8) this.plane(0.75, 0.75, mirror, x0 + 0.04, y + 1.5, z, Math.PI / 2);
     this.blockRect(x0, sinkFrom, x0 + 0.6, sinkTo);
 
-    // One stall in the far corner. Its door faces into the room and flies open later.
+    // One stall in the far corner, built like a giant low-poly bathroom cabinet:
+    // trim cap on top, base strip, a panelled door with a brass knob.
     const S = 2.0, sx0 = x1 - S, sz0 = z1 - S, doorW = 1.0, doorX = sx0 + 0.5;
-    const part = new THREE.MeshBasicMaterial({ color: 0x6e4a62, side: THREE.DoubleSide });
-    const stallH = 2.1, sy = y + stallH / 2;
-    this.plane(S, stallH, part, sx0, sy, sz0 + S / 2, Math.PI / 2);                    // side wall
-    this.plane(doorX - sx0, stallH, part, (sx0 + doorX) / 2, sy, sz0);                  // front, left of door
-    this.plane(x1 - (doorX + doorW), stallH, part, (doorX + doorW + x1) / 2, sy, sz0);  // front, right of door
+    const stallH = 2.2, T = 0.08;
+    const body = 0xf1ede4, trim = 0xfaf8f2, base = 0x8d8476, panel = 0xe3dccf, brass = 0xc9a14a;
+    const at = (mesh, px, py, pz) => { mesh.position.set(px, py, pz); this.scene.add(mesh); return mesh; };
+    // Side wall and the two front panels either side of the door.
+    at(kBox(T, stallH - 0.1, S, body), sx0, y + 0.1 + (stallH - 0.1) / 2, sz0 + S / 2);
+    at(kBox(doorX - sx0, stallH - 0.1, T, body), (sx0 + doorX) / 2, y + 0.1 + (stallH - 0.1) / 2, sz0);
+    at(kBox(x1 - doorX - doorW, stallH - 0.1, T, body), (doorX + doorW + x1) / 2, y + 0.1 + (stallH - 0.1) / 2, sz0);
+    // Base strip, set back a little, and a chunky trim cap along the top.
+    at(kBox(S, 0.1, T * 0.8, base), sx0 + S / 2, y + 0.05, sz0 + 0.01);
+    at(kBox(T * 0.8, 0.1, S, base), sx0 + 0.01, y + 0.05, sz0 + S / 2);
+    at(kBox(S + 0.1, 0.12, T + 0.1, trim), sx0 + S / 2 - 0.05, y + stallH + 0.06, sz0);
+    at(kBox(T + 0.1, 0.12, S, trim), sx0, y + stallH + 0.06, sz0 + S / 2);
     this.blockRect(sx0 - 0.06, sz0, sx0 + 0.06, z1);
     this.blockRect(sx0, sz0 - 0.06, doorX, sz0 + 0.06);
     this.blockRect(doorX + doorW, sz0 - 0.06, x1, sz0 + 0.06);
+    // The door hangs from a hinge on its left edge.
     const hinge = new THREE.Group();
-    hinge.position.set(doorX, y + 0.15, sz0);
-    const door = new THREE.Mesh(new THREE.PlaneGeometry(doorW, 1.85), new THREE.MeshBasicMaterial({ map: paint.stallDoor(true), side: THREE.DoubleSide }));
-    door.position.set(doorW / 2, 0.925, 0);
+    hinge.position.set(doorX, y + 0.12, sz0);
+    const doorH = stallH - 0.16, dw = doorW - 0.02;
+    const door = new THREE.Group();
+    door.add(at(kBox(dw, doorH, 0.06, body), dw / 2, doorH / 2, 0));
+    for (const side of [-1, 1]) {
+      // Two raised panels on each face, like a cabinet door.
+      door.add(at(kBox(dw - 0.24, doorH * 0.36, 0.02, panel), dw / 2, doorH * 0.73, side * 0.035));
+      door.add(at(kBox(dw - 0.24, doorH * 0.36, 0.02, panel), dw / 2, doorH * 0.29, side * 0.035));
+      const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.06, 8), shaded(brass));
+      knob.rotation.x = Math.PI / 2;
+      door.add(at(knob, dw - 0.1, doorH * 0.5, side * 0.07));
+    }
     hinge.add(door);
     this.scene.add(hinge);
     let swing = null;
@@ -297,6 +315,19 @@ export class World {
   update(time, dt) {
     for (const f of this.updaters) f(time, dt);
   }
+}
+
+// Kenney-style flat shading without lights: each face of a box gets a fixed shade.
+const shadeCache = {};
+function shaded(color) {
+  if (shadeCache[color]) return shadeCache[color];
+  const c = new THREE.Color(color);
+  const face = (k) => new THREE.MeshBasicMaterial({ color: c.clone().multiplyScalar(k) });
+  // BoxGeometry face order: +x, -x, +y, -y, +z, -z.
+  return (shadeCache[color] = [face(0.84), face(0.78), face(1), face(0.6), face(0.93), face(0.88)]);
+}
+function kBox(w, h, d, color) {
+  return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), shaded(color));
 }
 
 function loadImageData(src) {
