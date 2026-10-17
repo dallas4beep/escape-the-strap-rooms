@@ -95,3 +95,8 @@ this line, and gets sucked into her black hole.
 13. (GT) Do you wear a lot of Ed Hardy?
 14. (GT) I slept with Bella Hadid.
 16. Want to be our fourth?
+
+## Vortex announcements (top-right box, each time Community Strap sucks someone up)
+
+1. Community Strap sucked up another ex into her Vortex.
+2. Another lesbian sucked into a processing session.

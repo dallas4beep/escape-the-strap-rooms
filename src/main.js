@@ -89,8 +89,11 @@ async function load() {
   dialogue = dlg;
   credits = cred;
 
-  // Cast the night. 38 random faces: phone girl, 2 DJs, 7 named, dance floor, bathroom.
-  const slots = 1 + 2 + 7 + CONFIG.danceCrowd + CONFIG.bathroomCrowd;
+  // Cast the night: Sock, 2 DJs, 7 regulars' spots, the dance floor, the bathroom, the start
+  // hallway, and everyone else spread through the club. Her Own Primary makes it a full house.
+  const fixedSlots = 1 + 2 + 7 + CONFIG.danceCrowd + CONFIG.bathroomCrowd + CONFIG.hallwayCrowd;
+  const scatter = CONFIG.maxCharacters - 2 - fixedSlots;   // minus Community Strap and Her Own Primary
+  const slots = fixedSlots + scatter;
   const models = shuffle(MODELS.slice()).slice(0, 3 + Math.floor(Math.random() * 3));
   const looks = shuffle(chars.slice()).slice(0, slots - models.length).map((c) => ({ sprite: c }));
   for (const m of models) looks.splice(Math.floor(Math.random() * (looks.length + 1)), 0, { model: m });
@@ -140,6 +143,15 @@ async function load() {
   for (let i = 0; i < CONFIG.danceCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone on the dance floor", area: { min: [df.min[0] + 0.6, df.min[1] + 1.2], max: [df.max[0] - 0.6, df.max[1] - 0.4] } });
   const b = SPOTS.bathroom;
   for (let i = 0; i < CONFIG.bathroomCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone in the bathroom", area: { min: [b.min[0] + 0.9, b.min[1] + 0.5], max: [b.max[0] - 3.2, b.max[1] - 1.7] } });
+  // A few in the start hallway, either side of Sock.
+  const [sx, sz] = SPOTS.start.pos, [gx, gz] = SPOTS.phoneGirl;
+  [0.3, 0.55, 0.8, 1.35].slice(0, CONFIG.hallwayCrowd).forEach((t, i) => {
+    let x = sx + (gx - sx) * t, z = sz + (gz - sz) * t + (i % 2 ? 0.6 : -0.6);
+    if (!world.canNav(x, z)) z = sz + (gz - sz) * t;
+    addNpc(next(), { kind: "crowd", name: "Patron", at: [x, z], wander: 0.4 });
+  });
+  // Everyone else, spread out through the rest of the club.
+  for (const at of scatterSpots(scatter)) addNpc(next(), { kind: "crowd", name: "Patron", at, wander: 1.5 });
 
   vortex = createVortex();
   hole = vortex.sprite;
@@ -189,6 +201,30 @@ function pickCrowdLines() {
   return [c[a], c[b]];
 }
 
+// Open floor all over the club, reachable from the start, away from the special rooms,
+// the dance floor and the start hallway, and well apart from everyone already placed.
+function scatterSpots(count) {
+  const field = new Int32Array(world.nW * world.nH);
+  world.updateFlow(SPOTS.start.pos[0], SPOTS.start.pos[1], field);
+  const pad = (r, m) => ({ min: [r.min[0] - m, r.min[1] - m], max: [r.max[0] + m, r.max[1] + m] });
+  const keepOut = [pad(SPOTS.bathroom, 1), pad(SPOTS.keyRoom, 1.5), pad(SPOTS.danceFloor, 1)];
+  const inside = (x, z) => keepOut.some((r) => x > r.min[0] && x < r.max[0] && z > r.min[1] && z < r.max[1]);
+  const cells = [];
+  for (let i = 0; i < field.length; i++) {
+    if (field[i] < 0) continue;
+    const x = world.grid.originX + (i % world.nW + 0.5) * world.nCell, z = world.grid.originZ + (((i / world.nW) | 0) + 0.5) * world.nCell;
+    if (Math.hypot(x - SPOTS.start.pos[0], z - SPOTS.start.pos[1]) < 22 || inside(x, z)) continue;
+    cells.push([x, z]);
+  }
+  const out = [];
+  for (let tries = 0; out.length < count && tries < count * 200; tries++) {
+    const c = cells[Math.floor(Math.random() * cells.length)];
+    const near = (q) => Math.hypot(q[0] - c[0], q[1] - c[1]) < CONFIG.scatterSpacing;
+    if (!npcs.some((n) => near([n.x, n.z])) && !out.some(near)) out.push(c);
+  }
+  return out;
+}
+
 // A free spot in an area, kept "spacing" metres away from everyone else when possible.
 function randomPointIn(area, spacing = CONFIG.npcSpacing, self = null) {
   let fallback = null;
@@ -234,6 +270,8 @@ function placeForStart() {
   for (const n of npcs) if (n.fromStall) scene.remove(n.actor.object);
   npcs = npcs.filter((n) => !n.fromStall);
   endAccost(true);
+  if (state.feed) { state.feed.npc.actor.object.scale.copy(state.feed.npc.baseScale); state.feed = null; }
+  state.feedTimer = rand(...CONFIG.feedEvery);
   state.accostTimer = rand(...CONFIG.accostEvery);
   for (const n of npcs) {
     [n.x, n.z] = n.home;
@@ -268,6 +306,7 @@ function startChase() {
   strap.elapsed = 0;
   state.lastStatus = "";
   updateStatus();
+  showPopulation();
 }
 
 // ---------- Intro ----------
@@ -462,8 +501,8 @@ function updateNpcs(dt, frozen) {
   for (const n of npcs) {
     n.cooldown = Math.max(0, n.cooldown - dt);
     if (!frozen) {
-      if (n === (state.accost && state.accost.npc)) {
-        // busy shouting at Community Strap; updateAccost moves them
+      if (busy(n)) {
+        // being dealt with by Community Strap; updateAccost / updateFeed move them
       } else if (n.kind === "sock") {
         // Strolls down the hallway toward where you started.
         if (state.phase === "walk") moveToward(n, SPOTS.start.pos[0] + 6, SPOTS.start.pos[1], 0.9, dt);
@@ -486,7 +525,7 @@ function updateNpcs(dt, frozen) {
         if (n.goal && moveToward(n, n.goal[0], n.goal[1], CONFIG.wanderSpeed, dt)) n.goal = null;
       }
     }
-    if (n === (state.accost && state.accost.npc)) n.actor.face(strap.x, strap.z);
+    if (busy(n)) n.actor.face(strap.x, strap.z);
     else if (dist(n) < 5) n.actor.face(p.x, p.z);
     else if (n.goal) n.actor.face(n.goal[0], n.goal[1]);
     n.actor.object.position.set(n.x, world.floorY, n.z);
@@ -716,11 +755,65 @@ function updateSock(dt) {
     n.actor.update(dt);
     if (s.t > 3.2) { s.stage = "hole"; s.t = 0; s.from = [n.x, n.z]; hideToast(); }
   } else if (suckFrame(n, s.from, s.t, dt)) {
-    scene.remove(n.actor.object);
-    npcs = npcs.filter((m) => m !== n);
+    devour(n);
     state.sock = null;
     setTimeout(s.done, 500);
   }
+}
+
+// ---------- Community Strap eating the club ----------
+const busy = (n) => n === (state.accost && state.accost.npc) || n === (state.feed && state.feed.npc);
+
+// Anyone who strays close to her gets pulled in, while she keeps coming for you.
+function updateFeed(dt) {
+  const f = state.feed;
+  if (!f) {
+    if (!strap.active || strap.elapsed < CONFIG.enemyStartDelay || state.accost) return;
+    state.feedTimer -= dt;
+    if (state.feedTimer > 0) return;
+    state.feedTimer = 0.5;           // look again shortly if nobody's close enough
+    let best = null, bestD = CONFIG.feedRange;
+    for (const n of npcs) {
+      if (n.kind !== "crowd" || busy(n) || n === (state.dialogue && state.dialogue.npc)) continue;
+      const d = Math.hypot(n.x - strap.x, n.z - strap.z);
+      if (d < bestD) { best = n; bestD = d; }
+    }
+    if (!best) return;
+    best.baseScale = best.actor.object.scale.clone();
+    best.goal = null;
+    best.followTimer = 0;
+    state.feed = { npc: best, from: [best.x, best.z], t: 0 };
+    return;
+  }
+  f.t += dt;
+  if (suckFrame(f.npc, f.from, f.t, dt)) {
+    devour(f.npc);
+    state.feed = null;
+    state.feedTimer = rand(...CONFIG.feedEvery);
+  }
+}
+
+// Someone's gone for good: off the map, and the population box counts them down.
+function devour(n) {
+  scene.remove(n.actor.object);
+  npcs = npcs.filter((m) => m !== n);
+  const lines = dialogue.vortex && dialogue.vortex.length ? dialogue.vortex : ["Community Strap sucked up another ex into her Vortex."];
+  showPopulation(lines[Math.floor(Math.random() * lines.length)]);
+}
+
+let popTimer = null;
+function showPopulation(message) {
+  $("pop-count").textContent = `Messy Dyke Population: ${npcs.length}`;
+  $("pop").classList.remove("hidden");
+  if (!message) return;
+  const el = $("pop-msg");
+  el.textContent = message;
+  el.classList.remove("hidden");
+  $("pop").classList.remove("bump");
+  void $("pop").offsetWidth;          // restart the little shake
+  $("pop").classList.add("bump");
+  clearTimeout(popTimer);
+  popTimer = setTimeout(() => el.classList.add("hidden"), 4200);
 }
 
 // ---------- Patrons confronting Community Strap ----------
@@ -754,8 +847,7 @@ function updateAccost(dt) {
     hole.visible = true;
   } else if (a.stage === "hole") {
     if (suckFrame(n, a.from, a.t, dt)) {
-      scene.remove(n.actor.object);
-      npcs = npcs.filter((m) => m !== n);
+      devour(n);
       state.accost = null;
       hideToast();
       setTimeout(() => { strap.held = false; }, 900);
@@ -766,7 +858,8 @@ function updateAccost(dt) {
 
 function startAccost() {
   state.accostTimer = rand(4, 8);   // try again soon if nobody's around
-  const pool = npcs.filter((n) => !["dj", "primary"].includes(n.kind) && n !== (state.dialogue && state.dialogue.npc) &&
+  if (state.feed) return;           // one vortex at a time
+  const pool = npcs.filter((n) => !["dj", "primary", "sock"].includes(n.kind) && n !== (state.dialogue && state.dialogue.npc) &&
     Math.hypot(n.x - strap.x, n.z - strap.z) < CONFIG.accostRange);
   if (!pool.length) return;
   // Crowd first; the named regulars only when nobody else is around.
@@ -855,6 +948,7 @@ function showScreen(name) {
   const inGame = !name;
   $("hud").classList.toggle("hidden", !inGame);
   $("crosshair").classList.toggle("hidden", !inGame);
+  if (!inGame) $("pop").classList.add("hidden");
 }
 
 function renderCredits() {
@@ -910,7 +1004,7 @@ function loop(now) {
     updateRushers(dt);
     if (state.sock) updateSock(dt);
     world.keyRoom.near(state.player.x, state.player.z);
-    if (state.phase === "play" && !frozen) updateAccost(dt);
+    if (state.phase === "play" && !frozen) { updateAccost(dt); updateFeed(dt); }
     key.update(dt);
     soda.update(dt);
     world.update(state.time, dt);

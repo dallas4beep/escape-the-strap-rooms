@@ -319,3 +319,31 @@ body.touch #hud { font-size: 14px; max-width: 70vw; }
 }
 #toast-name { display: block; font-size: 13px; color: var(--cyan); margin-bottom: 4px; }
 body.touch #toast { font-size: 14px; bottom: calc(16px + env(safe-area-inset-bottom)); width: min(620px, calc(100vw - 190px)); }
+
+/* Top right: who Community Strap has sucked up, and how many are left. */
+#pop {
+    position: fixed;
+    top: calc(16px + env(safe-area-inset-top));
+    right: calc(16px + env(safe-area-inset-right));
+    max-width: min(320px, 42vw);
+    padding: 8px 12px;
+    font-size: 15px;
+    text-align: right;
+    background: rgba(18, 10, 31, 0.75);
+    border: 2px dashed var(--magenta);
+    box-shadow: 0 0 14px rgba(255, 112, 166, 0.5);
+    text-shadow: -1px 0 rgba(255, 0, 80, 0.6), 1px 0 rgba(0, 255, 255, 0.4);
+    pointer-events: none;
+    z-index: 10;
+}
+#pop-msg { color: var(--sunset-orange); margin-bottom: 6px; line-height: 1.35; }
+#pop-count { color: var(--cyan); letter-spacing: 0.5px; }
+#pop.bump { animation: pop-bump 0.45s ease-out; }
+@keyframes pop-bump {
+    0% { transform: translateX(0); box-shadow: 0 0 30px rgba(169, 0, 255, 0.9); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+}
+body.touch #pop { font-size: 12px; max-width: 38vw; padding: 5px 8px; }
+@media (max-height: 500px) { #pop { font-size: 12px; padding: 5px 9px; } }

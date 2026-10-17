@@ -18,7 +18,9 @@ export const CONFIG = {
   catchDistance: 0.65,
   quietNearStrap: 12,          // NPCs won't start a conversation while she's this close to you
 
-  accostEvery: [14, 26],       // seconds between NPCs storming up to Community Strap
+  accostEvery: [10, 18],       // seconds between NPCs storming up to Community Strap
+  feedRange: 7,                // she sucks in anyone who gets this close (metres)
+  feedEvery: [2, 4],           // seconds between those
   accostRange: 30,             // only NPCs this close to her will go
   accostSpeed: 3.0,
   stallCrowd: 30,              // people who burst out of the bathroom stall
@@ -44,7 +46,9 @@ export const CONFIG = {
     hearDistance: 28,
   },
 
-  maxCharacters: 40,           // everyone on the map, Community Strap included
+  maxCharacters: 60,           // everyone on the map, Community Strap included
+  hallwayCrowd: 4,             // patrons in the start hallway besides Sock
+  scatterSpacing: 3,           // how far apart the patrons spread through the rest of the club
   danceCrowd: 6,
   bathroomCrowd: 3,
 };
