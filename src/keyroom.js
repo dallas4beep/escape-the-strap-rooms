@@ -4,6 +4,7 @@
 // the video loads (or if it can't), scrolling lyrics take its place.
 import * as THREE from "three";
 import { SPOTS } from "./config.js";
+import { clubify } from "./clublook.js";
 
 const WALL_H = 2.64;          // this hall is taller than the club
 const SCROLL = 0.55;          // metres per second the band moves along the walls
@@ -112,46 +113,123 @@ function floorQuad(corners, s0, s1) {
   return g;
 }
 
-// Plain mono-yellow wallpaper to match the Backrooms halls outside the room.
-function wallpaper() {
-  const c = document.createElement("canvas");
-  c.width = 64;
-  c.height = 256;
+// The sign: the band's neon two-headed planet and name, then EVIL ROOM DO NOT ENTER in
+// dripping Nosifer, with drops of blood that fall from the letters and fade, over and over.
+function evilSign() {
+  const S = 512, c = document.createElement("canvas");
+  c.width = c.height = S;
   const g = c.getContext("2d");
-  g.fillStyle = "#cbb46c";
-  g.fillRect(0, 0, 64, 256);
-  g.fillStyle = "rgba(120,95,30,0.12)";
-  for (let x = 4; x < 64; x += 16) g.fillRect(x, 0, 3, 256);
-  g.fillStyle = "rgba(90,70,20,0.35)";
-  g.fillRect(0, 244, 64, 12);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.wrapS = THREE.RepeatWrapping;
-  return t;
-}
+  const base = document.createElement("canvas");
+  base.width = base.height = S;
 
-function neonSign() {
-  const c = document.createElement("canvas");
-  c.width = 512;
-  c.height = 148;
-  const g = c.getContext("2d");
-  g.fillStyle = "rgba(10,4,20,0.92)";
-  g.fillRect(0, 0, 512, 148);
-  g.strokeStyle = "#5ff0ff";
-  g.lineWidth = 4;
-  g.shadowColor = "#5ff0ff";
-  g.shadowBlur = 12;
-  g.strokeRect(8, 8, 496, 132);
-  g.font = "bold 64px 'Bebas Neue', Impact, sans-serif";
-  g.textAlign = "center";
-  g.textBaseline = "middle";
-  g.shadowColor = "#ff4fa3";
-  g.shadowBlur = 22;
-  g.fillStyle = "#ffd1e8";
-  g.fillText("GIRL TRASH", 256, 78);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
+  const neon = (ctx, color, width, draw) => {
+    ctx.save();
+    ctx.lineCap = ctx.lineJoin = "round";
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 18;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width + 3;
+    ctx.globalAlpha = 0.55;
+    draw(); ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 6;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = width * 0.45;
+    draw(); ctx.stroke();
+    ctx.restore();
+  };
+
+  function drawBase() {
+    const b = base.getContext("2d");
+    b.clearRect(0, 0, S, S);
+    b.fillStyle = "rgba(10,4,16,0.94)";
+    b.fillRect(6, 6, S - 12, S - 12);
+    const cyan = "#4ff7f0", pink = "#ff4fd8";
+    // Two smiling planets sharing one ring: back half of the ring, planets, front half.
+    const ring = (from, to, color) => neon(b, color, 4, () => {
+      b.beginPath(); b.ellipse(256, 120, 205, 42, -0.12, from, to);
+    });
+    ring(Math.PI, Math.PI * 1.5, cyan);
+    ring(Math.PI * 1.5, Math.PI * 2, pink);
+    for (const [x, y, r, color] of [[300, 102, 74, pink], [200, 112, 70, cyan]]) {
+      b.fillStyle = "#0a0410";
+      b.beginPath(); b.arc(x, y, r, 0, Math.PI * 2); b.fill();
+      neon(b, color, 4, () => { b.beginPath(); b.arc(x, y, r, 0, Math.PI * 2); });
+    }
+    neon(b, cyan, 4, () => { b.beginPath(); b.ellipse(182, 108, 9, 18, 0, 0, Math.PI * 2); b.moveTo(222, 108); b.ellipse(213, 108, 9, 18, 0, 0, Math.PI * 2); });
+    neon(b, cyan, 4, () => { b.beginPath(); b.arc(196, 108, 46, 0.25 * Math.PI, 0.85 * Math.PI); });
+    neon(b, pink, 4, () => { b.beginPath(); b.arc(296, 98, 50, 1.05 * Math.PI, 1.85 * Math.PI); });
+    neon(b, pink, 4, () => { b.beginPath(); b.arc(290, 132, 13, Math.PI, 0); b.moveTo(342, 132); b.arc(329, 132, 13, Math.PI, 0); });
+    ring(0, Math.PI, cyan);
+    ring(0, Math.PI * 0.45, pink);
+    // The band name in pink neon outline.
+    b.save();
+    b.font = "52px 'Bungee', Impact, sans-serif";
+    b.textAlign = "center";
+    b.textBaseline = "middle";
+    b.lineJoin = "round";
+    b.shadowColor = pink;
+    b.shadowBlur = 16;
+    b.strokeStyle = pink;
+    b.lineWidth = 5;
+    b.strokeText("2 HEADED GIRL", 256, 236);
+    b.shadowBlur = 4;
+    b.strokeStyle = "#ffd6f6";
+    b.lineWidth = 1.6;
+    b.strokeText("2 HEADED GIRL", 256, 236);
+    // The warning: near-black letters with a red glow.
+    b.font = "50px 'Nosifer', Impact, sans-serif";
+    b.shadowColor = "#CF000F";
+    b.shadowBlur = 14;
+    b.fillStyle = "#111";
+    for (let k = 0; k < 3; k++) {
+      b.fillText("EVIL ROOM", 256, 336);
+      b.font = "36px 'Nosifer', Impact, sans-serif";
+      b.fillText("DO NOT ENTER", 256, 420);
+      b.font = "50px 'Nosifer', Impact, sans-serif";
+    }
+    b.restore();
+  }
+  drawBase();
+  if (document.fonts && document.fonts.load) {
+    Promise.all([document.fonts.load("50px 'Nosifer'"), document.fonts.load("52px 'Bungee'")]).then(() => { drawBase(); update(0); }).catch(() => {});
+  }
+
+  // Nine drops, each with its own spot, fall distance, fall time and start delay (from the original pen).
+  const drops = [[118, 352, 50, 1.9, 0], [176, 352, 70, 2.8, 1.7], [252, 352, 30, 0.6, 4.0], [352, 352, 40, 0.7, 2.7],
+    [104, 432, 50, 1.7, 3.8], [178, 432, 80, 1.7, 0.8], [262, 432, 30, 1.1, 2.3], [330, 432, 50, 1.8, 3.5], [402, 432, 120, 1.8, 3.0]];
+  const drop = (x, y, alpha) => {
+    const grad = g.createLinearGradient(x - 6, 0, x + 6, 0);
+    grad.addColorStop(0, `rgba(100,0,0,${0.7 * alpha})`);
+    grad.addColorStop(1, `rgba(255,0,0,${0.7 * alpha})`);
+    g.fillStyle = grad;
+    g.beginPath();
+    g.moveTo(x, y - 14);
+    g.bezierCurveTo(x + 2, y - 6, x + 7, y - 2, x + 7, y + 4);
+    g.arc(x, y + 4, 7, 0, Math.PI);
+    g.bezierCurveTo(x - 7, y - 2, x - 2, y - 6, x, y - 14);
+    g.fill();
+  };
+
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  function update(time) {
+    g.clearRect(0, 0, S, S);
+    // The neon buzzes now and then.
+    g.globalAlpha = Math.random() < 0.025 ? 0.55 : 1;
+    g.drawImage(base, 0, 0);
+    g.globalAlpha = 1;
+    for (const [x, y, fall, dur, delay] of drops) {
+      const t = (time - delay) % 6;
+      if (time < delay || t > dur + 0.5) continue;
+      const p = Math.min(1, t / dur);
+      const ease = 1 - Math.pow(1 - p, 2);
+      drop(x, y + fall * ease, t > dur ? 1 - (t - dur) / 0.5 : Math.min(1, t / 0.5));
+    }
+    texture.needsUpdate = true;
+  }
+  update(0);
+  return { texture, update };
 }
 
 function glowTexture() {
@@ -215,53 +293,43 @@ export function buildKeyRoom(world) {
   add(floorQuad([[x0, fy, z1], [x0, fy, z0], [x0 + D, fy, z0 + D], [x0 + D, fy, z1 - D]], sA, sB), reflectMat);
   add(floorQuad([[x0, fy, z0], [x1, fy, z0], [x1, fy, z0 + D], [x0 + D, fy, z0 + D]], sB, sC), reflectMat);
 
-  // East wall with the doorway, black inside, Backrooms wallpaper outside.
+  // East wall with the doorway: black inside, the club's own walls outside so it sits
+  // in the level like any other room.
   const mid = y + WALL_H / 2;
-  const outside = (len) => {
-    const t = wallpaper();
-    t.repeat.set(len / 1.2, 1);
-    return new THREE.MeshBasicMaterial({ map: t });
-  };
+  const outsideMat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+  clubify(outsideMat, "Wall_1");
   const a = R.doorFrom - z0, b = z1 - R.doorTo, lintel = R.doorTo - R.doorFrom;
   world.plane(a, WALL_H, black, x1 - inset, mid, z0 + a / 2, -Math.PI / 2);
   world.plane(b, WALL_H, black, x1 - inset, mid, R.doorTo + b / 2, -Math.PI / 2);
   world.plane(lintel, 0.4, black, x1 - inset, top - 0.2, R.doorFrom + lintel / 2, -Math.PI / 2);
-  world.plane(a, WALL_H, outside(a), x1 + inset, mid, z0 + a / 2, Math.PI / 2);
-  world.plane(b, WALL_H, outside(b), x1 + inset, mid, R.doorTo + b / 2, Math.PI / 2);
-  world.plane(lintel, 0.4, outside(lintel), x1 + inset, top - 0.2, R.doorFrom + lintel / 2, Math.PI / 2);
-  world.plane(w, WALL_H, outside(w), x0 + w / 2, mid, z1 + inset, 0);
+  world.plane(a, WALL_H, outsideMat, x1 + inset, mid, z0 + a / 2, Math.PI / 2);
+  world.plane(b, WALL_H, outsideMat, x1 + inset, mid, R.doorTo + b / 2, Math.PI / 2);
+  world.plane(lintel, 0.4, outsideMat, x1 + inset, top - 0.2, R.doorFrom + lintel / 2, Math.PI / 2);
+  world.plane(w, WALL_H, outsideMat, x0 + w / 2, mid, z1 + inset, 0);
   world.blockRect(x1 - 0.08, z0, x1 + 0.08, R.doorFrom);
   world.blockRect(x1 - 0.08, R.doorTo, x1 + 0.08, z1);
   world.blockRect(x0, z1 - 0.08, x1, z1 + 0.08);
 
-  // Neon outside so nobody walks past it: pink trim, a cyan door frame, a lit sign,
-  // and light spilling out of the doorway.
-  const pink = new THREE.MeshBasicMaterial({ color: 0xff4fa3 });
-  const cyan = new THREE.MeshBasicMaterial({ color: 0x5ff0ff });
-  const bar = (sx, sy, sz, mat, px, py, pz) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
+  // The same neon strips as every other wall in the club.
+  const strip = (len, h, py, color, px, pz, alongZ) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(alongZ ? 0.02 : len, h, alongZ ? len : 0.02),
+      new THREE.MeshBasicMaterial({ color, fog: false }));
     m.position.set(px, py, pz);
     scene.add(m);
   };
-  const doorTop = top - 0.4, dm = (R.doorFrom + R.doorTo) / 2;
-  bar(0.06, 0.06, d, pink, x1 + 0.07, top - 0.06, z0 + d / 2);
-  bar(0.06, 0.06, d, pink, x1 + 0.07, y + 0.06, z0 + d / 2);
-  bar(w, 0.06, 0.06, pink, x0 + w / 2, top - 0.06, z1 + 0.07);
-  bar(w, 0.06, 0.06, pink, x0 + w / 2, y + 0.06, z1 + 0.07);
-  bar(0.06, doorTop - y, 0.06, cyan, x1 + 0.07, (y + doorTop) / 2, R.doorFrom);
-  bar(0.06, doorTop - y, 0.06, cyan, x1 + 0.07, (y + doorTop) / 2, R.doorTo);
-  bar(0.06, 0.06, R.doorTo - R.doorFrom, cyan, x1 + 0.07, doorTop, dm);
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.75), new THREE.MeshBasicMaterial({ map: neonSign(), transparent: true }));
-  sign.rotation.y = Math.PI / 2;
-  sign.position.set(x1 + 0.08, y + 1.55, R.doorTo + 1.7);
-  scene.add(sign);
-  const spill = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 3.6),
-    new THREE.MeshBasicMaterial({ map: glowTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8 }));
-  spill.rotation.x = -Math.PI / 2;
-  spill.position.set(x1 + 1.4, y + 0.05, dm);
-  scene.add(spill);
-  // The sign buzzes and flickers now and then.
-  world.updaters.push(() => { sign.material.opacity = Math.random() < 0.03 ? 0.35 : 1; });
+  for (const [py, h, color] of [[y + 0.07, 0.06, 0xff3d9a], [y + 2.355, 0.05, 0x9b5cff]]) {
+    strip(a, h, py, color, x1 + 0.05, z0 + a / 2, true);
+    strip(b, h, py, color, x1 + 0.05, R.doorTo + b / 2, true);
+    strip(w, h, py, color, x0 + w / 2, z1 + 0.05, false);
+  }
+
+  // The sign by the door: the band's neon logo, then a warning, dripping blood.
+  const sign = evilSign();
+  const signMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 2.0), new THREE.MeshBasicMaterial({ map: sign.texture, transparent: true }));
+  signMesh.rotation.y = Math.PI / 2;
+  signMesh.position.set(x1 + 0.06, y + 1.38, R.doorTo + 1.6);
+  scene.add(signMesh);
+  world.updaters.push((time) => { if (wanted) sign.update(time); });
 
   // A pool of light on the floor where the carabiner floats.
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2),

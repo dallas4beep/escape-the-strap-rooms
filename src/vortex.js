@@ -8,9 +8,9 @@
  * copyright notice and this permission notice shall be included in all copies or substantial
  * portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
  */
-// Drawn on a canvas every frame it's visible and shown as a sprite at her crotch: a funnel
-// of rings and spokes sinking toward a point, particles rising out of it, a purple glow,
-// a shifting cyan/peach/gold aura and scanlines. The edges fade out so it floats in the room.
+// Drawn on a see-through canvas every frame it's visible and shown as a sprite whose narrow
+// end sits at her crotch: a funnel of rings and spokes, particles, a purple glow, a shifting
+// cyan/peach/gold aura and scanlines. The edges fade out so it floats in the room.
 import * as THREE from "three";
 
 const SIZE = 256;
@@ -51,7 +51,7 @@ export function createVortex() {
   lines.width = W;
   lines.height = H;
   const lctx = lines.getContext("2d");
-  lctx.strokeStyle = "#7a5aa8";
+  lctx.strokeStyle = "#c08cff";
   lctx.lineWidth = 1;
   for (let i = 0; i < LINES; i++) {
     const a = (i / LINES) * Math.PI * 2;
@@ -108,10 +108,8 @@ export function createVortex() {
 
     ctx.globalCompositeOperation = "source-over";
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#0b0612";
-    ctx.fillRect(0, 0, W, H);
 
-    ctx.strokeStyle = "#7a5aa8";
+    ctx.strokeStyle = "#c08cff";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.ellipse(start.x, start.y, start.w, start.h, 0, 0, Math.PI * 2);
@@ -154,10 +152,13 @@ export function createVortex() {
     ctx.globalCompositeOperation = "lighter";
     ctx.drawImage(auraLayer.canvas, 0, 0);
 
-    ctx.globalCompositeOperation = "overlay";
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = 0.45;
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
     for (let y = 1; y < H; y += 3) ctx.fillRect(0, y, W, 1);
 
     ctx.globalCompositeOperation = "destination-in";
@@ -173,7 +174,7 @@ export function createVortex() {
   auraLayer.ctx = auraLayer.canvas.getContext("2d");
 
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false }));
-  sprite.center.set(0.5, 0.55);     // the funnel's mouth sits on the anchor point
+  sprite.center.set(0.5, 0.06);     // the funnel's narrow end sits on the anchor point
   sprite.visible = false;
   update(0);
   return { sprite, update };

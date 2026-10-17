@@ -60,8 +60,8 @@ export const SPOTS = {
   // The carabiner sits alone in the middle of the video room in the west hall.
   key: [-64.65, -0.85],
   // The Mushroom Dome Bar in the middle hall, doorway facing the way in from the east.
-  // It's scaled up so its archway is person-sized; it rises through a hole in the ceiling.
-  mushroom: { pos: [-49.3, 10.3], yaw: 2.6, size: 2.6, hole: 6.4 },
+  // It's scaled up so its archway is person-sized; inside a round wall, it rises through a hole in the ceiling.
+  mushroom: { pos: [-49.3, 10.3], yaw: 2.6, size: 2.6, hole: 6.35 },
   keyRoom: { min: [-67.9, -4.25], max: [-61.4, 2.55], doorFrom: -1.45, doorTo: -0.35 },
   exitDoor: [-50.0, -4.1],
 

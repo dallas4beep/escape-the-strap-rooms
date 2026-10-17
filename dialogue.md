@@ -112,14 +112,11 @@ Each random character gets 2 of these.
 17. (GT) Is that the Girl Trash remix? Oh no. That means she's close.
 18. (GT) Someone in the stall said it was the smallest line she's ever seen. Like a whisper or a dream. Anyway, the soap's out.
 
-## Intro phone girl
-
-No lines. The texting video plays instead, and its texts are your opening lyrics.
-
-
 ## Intro: Sock (confronts Community Strap, then gets sucked into the black hole)
 
-Plays right after the phone call video, while the camera is turned around on Community Strap.
+Sock walks toward you down the start hallway. Once you pass them, a phone rings (once) and the
+phone call video plays. Then the camera turns around: Sock has walked on to Community Strap, says
+this line, and gets sucked into her black hole.
 
 1. How you gonna ghost me and then pull up to my DJ set?
 ## What NPCs shout at Community Strap (right before the black hole)

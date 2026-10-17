@@ -130,7 +130,8 @@ async function load() {
   // Everyone else
   let li = 0;
   const next = () => make(looks[li++]);
-  phoneGirl = addNpc(next(), { kind: "phone", name: "Girl on the phone", at: SPOTS.phoneGirl, wander: 0 });
+  // Sock: walking down the start hallway toward you. Passing them sets off the intro.
+  phoneGirl = addNpc(next(), { kind: "sock", name: "Sock", at: SPOTS.phoneGirl, wander: 0, lines: [] });
   SPOTS.djs.forEach((at, i) => addNpc(next(), { kind: "dj", name: "DJ", at, wander: 0, lines: i ? dialogue.djRight : dialogue.djLeft, talkRange: 1.9 }));
   for (const [name, at] of Object.entries(SPOTS.named)) addNpc(next(), { kind: "named", name, at, wander: 1.2, lines: dialogue.named[name] || [] });
   addNpc(A.cardActor(fixed.primary, 1.5), { kind: "primary", name: "Her Own Primary", at: SPOTS.primary, wander: 0, lines: dialogue.primary });
@@ -269,19 +270,23 @@ function startChase() {
 }
 
 // ---------- Intro ----------
-function beginIntroLock() {
+// True once Sock is behind you: you've walked past them in the hallway.
+function passedSock() {
+  const p = state.player, s = phoneGirl;
+  const dx = s.x - p.x, dz = s.z - p.z;
+  return Math.hypot(dx, dz) < 6 && dx * Math.cos(p.yaw) + dz * Math.sin(p.yaw) < -0.5;
+}
+
+async function beginIntroLock() {
   state.phase = "lock";
   input.enabled = false;
   releaseTouches();
-  const g = phoneGirl;
-  tweenCameraTo(g.x, world.floorY + g.actor.height * 0.8, g.z, 1.2, async () => {
-    // Her phone rings first, then the texts come up.
-    await audio.playOnce("ring");
-    state.phase = "introVideo";
-    await playVideo(videoSrc("intro"), { muted: false, closable: false });
-    hideVideo();
-    beginPan();
-  });
+  // A phone rings once, then the texts come up.
+  await audio.playOnce("ring");
+  state.phase = "introVideo";
+  await playVideo(videoSrc("intro"), { muted: false, closable: false });
+  hideVideo();
+  beginPan();
 }
 
 // The camera turns around: Community Strap is behind you. Then it snaps back to face
@@ -290,7 +295,7 @@ function beginPan() {
   state.phase = "pan";
   const p = state.player, g = phoneGirl;
   const dx = g.x - p.x, dz = g.z - p.z, len = Math.hypot(dx, dz) || 1;
-  const bx = -dx / len, bz = -dz / len;           // straight behind the player
+  const bx = dx / len, bz = dz / len;             // behind the player, past Sock
   let best = null, bestScore = Infinity;
   for (let x = p.x - 18; x <= p.x + 18; x += 0.5) for (let z = p.z - 18; z <= p.z + 18; z += 0.5) {
     const ox = x - p.x, oz = z - p.z, d = Math.hypot(ox, oz);
@@ -458,6 +463,9 @@ function updateNpcs(dt, frozen) {
     if (!frozen) {
       if (n === (state.accost && state.accost.npc)) {
         // busy shouting at Community Strap; updateAccost moves them
+      } else if (n.kind === "sock") {
+        // Strolls down the hallway toward where you started.
+        if (state.phase === "walk") moveToward(n, SPOTS.start.pos[0] + 6, SPOTS.start.pos[1], 0.9, dt);
       } else if (state.phase === "play" && !state.dialogue && n.cooldown === 0 && state.talkCooldown === 0 && n.lines.length &&
           dist(n) < n.talkRange && !(strap.active && dist(strap) < CONFIG.quietNearStrap)) {
         startTalk(n);
@@ -615,6 +623,7 @@ function updateRushers(dt) {
 // ---------- Community Strap's black hole ----------
 // One frame of the hole opening at her crotch and pulling victim n in, t seconds in.
 // Returns true when it's over (the hole has closed and they're gone).
+const holeAim = new THREE.Vector3(), victimAim = new THREE.Vector3();
 function suckFrame(n, from, t, dt) {
   // Nudged toward the victim so it sits in front of her.
   const dx = from[0] - strap.x, dz = from[1] - strap.z, dl = Math.hypot(dx, dz) || 1;
@@ -622,7 +631,11 @@ function suckFrame(n, from, t, dt) {
   const open = Math.min(1, t / 0.4), close = t > 1.8 ? Math.max(0, 1 - (t - 1.8) / 0.4) : 1;
   hole.visible = true;
   hole.position.set(hx, hy, hz);
-  hole.scale.setScalar(0.15 + 2.6 * open * close);
+  hole.scale.setScalar(0.15 + 2.4 * open * close);
+  // Point the funnel's wide end at the victim, as seen from the camera.
+  const a = holeAim.set(hx, hy, hz).project(camera), b = victimAim.set(n.x, world.floorY + 0.9, n.z).project(camera);
+  const sx = (b.x - a.x) * camera.aspect, sy = b.y - a.y;
+  hole.material.rotation = Math.hypot(sx, sy) > 0.02 ? Math.atan2(sy, sx) - Math.PI / 2 : Math.PI;
   vortex.update(dt);
   const pull = Math.min(1, Math.max(0, (t - 0.3) / 1.2));
   n.x = from[0] + (hx - from[0]) * pull;
@@ -638,18 +651,9 @@ function suckFrame(n, from, t, dt) {
 // ---------- The intro: Sock confronts Community Strap ----------
 // Plays while the camera is on her, so a first-time player sees what the black hole is.
 function sockScene(done) {
-  const look = extraLooks[Math.floor(Math.random() * extraLooks.length)];
-  const actor = makeActor(look);
-  // Start a few metres to one side of her so they walk across the shot.
-  const p = state.player, vx = strap.x - p.x, vz = strap.z - p.z, vl = Math.hypot(vx, vz) || 1;
-  let start = null;
-  for (const side of [1, -1]) for (const off of [4, 3, 2.2]) {
-    const x = strap.x - vz / vl * off * side - vx / vl * 1.2, z = strap.z + vx / vl * off * side - vz / vl * 1.2;
-    if (!start && world.canNav(x, z) && world.clearLine(x, z, strap.x, strap.z)) start = [x, z];
-  }
-  start = start || [strap.x - vx / vl * 2.5, strap.z - vz / vl * 2.5];
-  const sock = { actor, name: "Sock", x: start[0], z: start[1], baseScale: actor.object.scale.clone() };
-  scene.add(actor.object);
+  // Sock, who you passed in the hallway, has carried on walking and runs into her.
+  const sock = phoneGirl;
+  sock.baseScale = sock.actor.object.scale.clone();
   state.fovTarget = 24;          // close in on the two of them
   state.sock = { n: sock, stage: "walk", t: 0, done };
 }
@@ -672,6 +676,7 @@ function updateSock(dt) {
     if (s.t > 3.2) { s.stage = "hole"; s.t = 0; s.from = [n.x, n.z]; hideToast(); }
   } else if (suckFrame(n, s.from, s.t, dt)) {
     scene.remove(n.actor.object);
+    npcs = npcs.filter((m) => m !== n);
     state.sock = null;
     setTimeout(s.done, 500);
   }
@@ -858,8 +863,7 @@ function loop(now) {
       state.flowTimer -= dt;
       if (state.flowTimer <= 0) { state.flowTimer = 0.25; world.updateFlow(state.player.x, state.player.z); }
     }
-    if (state.phase === "walk" && state.walked >= CONFIG.introWalkDistance && dist(phoneGirl) < 30 &&
-        world.clearLine(state.player.x, state.player.z, phoneGirl.x, phoneGirl.z)) beginIntroLock();
+    if (state.phase === "walk" && (passedSock() || state.walked > 60)) beginIntroLock();
     updateNpcs(dt, frozen || state.phase === "title");
     updateStrap(dt, frozen);
     updateRushers(dt);
@@ -882,4 +886,4 @@ load().catch((e) => { $("loading-text").textContent = "Couldn't load the game. R
 requestAnimationFrame(loop);
 
 // Test builds only (removed from the real build).
-if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { updateRushers, state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
+if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
