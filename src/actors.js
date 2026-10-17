@@ -123,6 +123,11 @@ void main() {
   gl_FragColor = vec4(c.rgb, 1.0);
 }`;
 
+// Where the lower O-ring of her harness sits in each of the 11 looks, as a fraction of the
+// picture's width (from the left) and height (from the top). The black hole comes out of it.
+const RING = [[0.7, 0.62], [0.66, 0.62], [0.6, 0.62], [0.61, 0.62], [0.67, 0.62], [0.62, 0.6],
+  [0.57, 0.62], [0.69, 0.62], [0.66, 0.6], [0.63, 0.62], [0.63, 0.62]];
+
 export function strapActor(texture, rects, atlasW, atlasH, height) {
   texture.colorSpace = THREE.SRGBColorSpace;
   const uvRects = rects.map(([x, y, w, h]) => new THREE.Vector4(x / atlasW, 1 - (y + h) / atlasH, w / atlasW, h / atlasH));
@@ -140,9 +145,17 @@ export function strapActor(texture, rects, atlasW, atlasH, height) {
   }));
   const group = new THREE.Group();
   group.add(mesh);
-  let clock = 0, extra = 0;
+  let clock = 0, extra = 0, look = 0;
   return {
     object: group,
+    // The O-ring's position in the world right now (it moves with her bob and her look).
+    ringPosition(out) {
+      const [fx, fy] = RING[look % RING.length], w = height * aspects[look];
+      const ry = group.rotation.y, side = (fx - 0.5) * w;
+      return out.set(group.position.x + Math.cos(ry) * side + Math.sin(ry) * 0.06,
+        group.position.y + mesh.position.y + (0.5 - fy) * height,
+        group.position.z - Math.sin(ry) * side + Math.cos(ry) * 0.06);
+    },
     height: height + 0.5,
     rush: 0,
     // Extra glitch on top of the usual (0..1), e.g. when she's close or on camera.
@@ -150,6 +163,7 @@ export function strapActor(texture, rects, atlasW, atlasH, height) {
     update(dt, camera) {
       clock += dt;
       const i = Math.floor(clock) % rects.length, next = (i + 1) % rects.length, phase = clock % 1;
+      look = i;
       uniforms.rectA.value.copy(uvRects[i]);
       uniforms.rectB.value.copy(uvRects[next]);
       // Last fifth of every second: a hard glitch burst that flickers in the next look.

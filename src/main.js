@@ -645,11 +645,10 @@ function updateRushers(dt) {
 // ---------- Community Strap's black hole ----------
 // One frame of the hole opening at her crotch and pulling victim n in, t seconds in.
 // Returns true when it's over (the hole has closed and they're gone).
-const holeAim = new THREE.Vector3(), victimAim = new THREE.Vector3();
+const holeAim = new THREE.Vector3(), victimAim = new THREE.Vector3(), ringPos = new THREE.Vector3();
 function suckFrame(n, from, t, dt) {
-  // Nudged toward the victim so it sits in front of her.
-  const dx = from[0] - strap.x, dz = from[1] - strap.z, dl = Math.hypot(dx, dz) || 1;
-  const hx = strap.x + dx / dl * 0.15, hz = strap.z + dz / dl * 0.15, hy = world.floorY + 0.62;
+  // It comes out of the O-ring on her harness.
+  const ring = strap.actor.ringPosition(ringPos), hx = ring.x, hy = ring.y, hz = ring.z;
   const open = Math.min(1, t / 0.4), close = t > 1.85 ? Math.max(0, 1 - (t - 1.85) / 0.4) : 1;
   hole.visible = true;
   hole.renderOrder = 5;
@@ -928,4 +927,4 @@ load().catch((e) => { $("loading-text").textContent = "Couldn't load the game. R
 requestAnimationFrame(loop);
 
 // Test builds only (removed from the real build).
-if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { updateRushers, state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
+if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
