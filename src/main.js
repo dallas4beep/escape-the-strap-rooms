@@ -345,10 +345,21 @@ function playVideo(src, { muted, closable }) {
     const ended = () => {
       video.removeEventListener("ended", ended);
       if (!closable) { resolve(); return; }
-      // Hold on the last frame until the player closes it.
-      const close = $("video-close");
+      // Hold on the last frame until the player closes it: the X, Enter (or Space),
+      // or a tap/click anywhere on the screen.
+      const close = $("video-close"), layer = $("video-layer");
       close.classList.remove("hidden");
-      close.onclick = (e) => { e.stopPropagation(); close.onclick = null; resolve(); };
+      const done = (e) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        close.onclick = null;
+        layer.removeEventListener("pointerup", done);
+        document.removeEventListener("keydown", onKey, true);
+        resolve();
+      };
+      const onKey = (e) => { if (["Enter", "NumpadEnter", "Space", "Escape"].includes(e.code)) done(e); };
+      close.onclick = done;
+      layer.addEventListener("pointerup", done);
+      document.addEventListener("keydown", onKey, true);
     };
     video.addEventListener("ended", ended);
     const p = video.play();
