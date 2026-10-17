@@ -143,9 +143,10 @@ async function load() {
   for (let i = 0; i < CONFIG.danceCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone on the dance floor", area: { min: [df.min[0] + 0.6, df.min[1] + 1.2], max: [df.max[0] - 0.6, df.max[1] - 0.4] } });
   const b = SPOTS.bathroom;
   for (let i = 0; i < CONFIG.bathroomCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone in the bathroom", area: { min: [b.min[0] + 0.9, b.min[1] + 0.5], max: [b.max[0] - 3.2, b.max[1] - 1.7] } });
-  // A few in the start hallway, either side of Sock.
+  // A few further down the start hallway, past Sock. The intro turns the camera back the
+  // way you came, so they stay out of that shot.
   const [sx, sz] = SPOTS.start.pos, [gx, gz] = SPOTS.phoneGirl;
-  [0.3, 0.55, 0.8, 1.35].slice(0, CONFIG.hallwayCrowd).forEach((t, i) => {
+  [1.3, 1.5, 1.7, 1.9].slice(0, CONFIG.hallwayCrowd).forEach((t, i) => {
     let x = sx + (gx - sx) * t, z = sz + (gz - sz) * t + (i % 2 ? 0.6 : -0.6);
     if (!world.canNav(x, z)) z = sz + (gz - sz) * t;
     addNpc(next(), { kind: "crowd", name: "Patron", at: [x, z], wander: 0.4 });
