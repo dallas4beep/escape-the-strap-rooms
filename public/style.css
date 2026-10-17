@@ -302,7 +302,7 @@ body.touch #hud { font-size: 14px; max-width: 70vw; }
 /* Someone yelling at Community Strap. Doesn't pause the game. */
 #toast {
     position: fixed;
-    top: calc(64px + env(safe-area-inset-top));
+    bottom: calc(28px + env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     width: min(620px, 88vw);
@@ -318,4 +318,4 @@ body.touch #hud { font-size: 14px; max-width: 70vw; }
     z-index: 12;
 }
 #toast-name { display: block; font-size: 13px; color: var(--cyan); margin-bottom: 4px; }
-body.touch #toast { font-size: 14px; top: calc(56px + env(safe-area-inset-top)); }
+body.touch #toast { font-size: 14px; bottom: calc(16px + env(safe-area-inset-bottom)); width: min(620px, calc(100vw - 190px)); }

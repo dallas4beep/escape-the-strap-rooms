@@ -7,7 +7,7 @@ import { World } from "./world.js";
 import * as A from "./actors.js";
 import { input, setupInput, lockPointer, unlockPointer, releaseTouches, moveAxes, isTouchDevice } from "./input.js";
 import * as audio from "./audio.js";
-import { blackHole } from "./paint.js";
+import { createVortex } from "./vortex.js";
 import { protect } from "./protect.js";
 
 protect();
@@ -76,7 +76,7 @@ const state = {
   accost: null,               // the NPC storming up to Community Strap right now
 };
 let npcs = [], strap = null, key = null, soda = null, phoneGirl = null;
-let rushers = [], extraLooks = [], hole = null, makeActor = null;
+let rushers = [], extraLooks = [], hole = null, vortex = null, makeActor = null;
 let dialogue = null, credits = null;
 
 // ---------- Loading ----------
@@ -137,10 +137,10 @@ async function load() {
   const df = SPOTS.danceFloor;
   for (let i = 0; i < CONFIG.danceCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone on the dance floor", area: { min: [df.min[0] + 0.6, df.min[1] + 1.2], max: [df.max[0] - 0.6, df.max[1] - 0.4] } });
   const b = SPOTS.bathroom;
-  for (let i = 0; i < CONFIG.bathroomCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone in the bathroom", area: { min: [b.min[0] + 0.9, b.min[1] + 0.5], max: [b.max[0] - 0.4, b.max[1] - 1.7] } });
+  for (let i = 0; i < CONFIG.bathroomCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone in the bathroom", area: { min: [b.min[0] + 0.9, b.min[1] + 0.5], max: [b.max[0] - 3.2, b.max[1] - 1.7] } });
 
-  hole = new THREE.Sprite(new THREE.SpriteMaterial({ map: blackHole(), transparent: true, depthWrite: false }));
-  hole.visible = false;
+  vortex = createVortex();
+  hole = vortex.sprite;
   scene.add(hole);
 
   key = A.keyProp(fixed.key);
@@ -229,6 +229,8 @@ function placeForStart() {
   world.stall.close();
   for (const r of rushers) scene.remove(r.actor.object);
   rushers = [];
+  for (const n of npcs) if (n.fromStall) scene.remove(n.actor.object);
+  npcs = npcs.filter((n) => !n.fromStall);
   endAccost(true);
   state.accostTimer = rand(...CONFIG.accostEvery);
   for (const n of npcs) {
@@ -304,7 +306,7 @@ function beginPan() {
   strap.actor.object.visible = true;
   strap.actor.setExtra(0.6);
   state.fovTarget = 42;
-  tweenCameraTo(strap.x, world.floorY + 1.3, strap.z, 1.8, () => {
+  tweenCameraTo(strap.x, world.floorY + 1.3, strap.z, 1.8, () => sockScene(() => {
     setTimeout(() => {
       // Face the exact opposite way: away from her.
       const ax = p.x - (strap.x - p.x), az = p.z - (strap.z - p.z);
@@ -323,8 +325,8 @@ function beginPan() {
         lockPointer(renderer.domElement);
         startChase();
       });
-    }, 1200);
-  });
+    }, 600);
+  }));
 }
 
 // ---------- Video overlay ----------
@@ -545,60 +547,134 @@ function inBathroom(p) {
   return p.x > b.min[0] && p.x < b.max[0] && p.z > b.min[1] && p.z < b.max[1];
 }
 
-// The door flies open, thirty people pour out, and one of them drops the soda.
+// The door flies open and thirty people pour out and scatter across the club.
+// Once the last of them is out, the soda is left spinning inside the stall.
 function burstStall() {
   state.stall = "open";
   world.stall.open();
-  const [ix, iz] = world.stall.inside, [fx, fz] = world.stall.front;
-  const b = SPOTS.bathroom, doorX = (b.doorFrom + b.doorTo) / 2;
+  const [ix, iz] = world.stall.inside;
+  // Everywhere they could run to: open floor well away from the bathroom.
+  const fromStall = new Int32Array(world.nW * world.nH);
+  world.updateFlow(ix, iz, fromStall);
+  const spots = [];
+  for (let i = 0; i < fromStall.length; i += 7) if (fromStall[i] > 60) spots.push(i);
   for (let i = 0; i < CONFIG.stallCrowd; i++) {
-    const look = extraLooks[Math.floor(Math.random() * extraLooks.length)];
-    const actor = makeActor(look);
-    const r = {
-      actor,
-      x: ix + rand(-0.5, 0.5), z: iz + rand(-0.5, 0.5),
-      delay: i * 0.09,                         // they come out one after another
-      life: rand(7, 10),
-      speed: rand(3.2, 4.4),
-      // Out of the stall, out of the bathroom door, then off into the club.
-      path: [[fx + rand(-0.3, 0.3), fz - 0.4], [doorX + rand(-0.5, 0.5), b.min[1] + 0.6], [doorX + rand(-0.6, 0.6), b.min[1] - 1.2],
-             [doorX + rand(-12, 12), b.min[1] - rand(4, 12)]],
-    };
+    const actor = makeActor(extraLooks[Math.floor(Math.random() * extraLooks.length)]);
+    const cell = spots[Math.floor(Math.random() * spots.length)];
+    const goal = [world.grid.originX + (cell % world.nW + 0.5) * world.nCell, world.grid.originZ + (((cell / world.nW) | 0) + 0.5) * world.nCell];
     actor.object.visible = false;
     scene.add(actor.object);
-    rushers.push(r);
+    rushers.push({
+      actor, goal, field: null,
+      x: ix + rand(-0.4, 0.4), z: iz + rand(-0.4, 0.4),
+      delay: i * 0.12,                         // they come out one after another
+      life: 45,                                // in case someone gets stuck
+      speed: rand(3.2, 4.4),
+    });
   }
-  // Someone in the stampede drops the bottle.
-  setTimeout(() => {
-    if (state.stall !== "open") return;
-    for (let d = 1.6; d >= 0.6; d -= 0.2) {
-      const x = fx + rand(-0.4, 0.4), z = fz - d;
-      if (world.canWalk(x, z)) { state.sodaAt = [x, z]; break; }
-    }
-    state.sodaAt = state.sodaAt || [fx, fz - 1];
-    soda.object.position.set(state.sodaAt[0], world.floorY, state.sodaAt[1]);
-    soda.object.visible = true;
-  }, 900);
 }
 
 function updateRushers(dt) {
+  const [ix, iz] = world.stall.inside;
   for (const r of rushers) {
     if (r.delay > 0) { r.delay -= dt; continue; }
+    if (!r.field) {
+      // Each one finds their own way to their own corner of the club.
+      r.field = new Int32Array(world.nW * world.nH);
+      world.updateFlow(r.goal[0], r.goal[1], r.field);
+    }
     r.actor.object.visible = true;
     r.life -= dt;
-    if (r.path.length && moveToward(r, r.path[0][0], r.path[0][1], r.speed, dt)) r.path.shift();
-    else if (r.path.length && Math.hypot(r.path[0][0] - r.x, r.path[0][1] - r.z) < 0.3) r.path.shift();
-    if (r.path.length) r.actor.face(r.path[0][0], r.path[0][1]);
-    // They flicker out as they leave.
+    const step = world.flowStep(r.x, r.z, r.field);
+    if (step && Math.hypot(r.goal[0] - r.x, r.goal[1] - r.z) > 0.6) {
+      moveToward(r, step[0], step[1], r.speed, dt);
+      r.actor.face(step[0], step[1]);
+    } else r.life = Math.min(r.life, 0);
     r.actor.object.position.set(r.x, world.floorY, r.z);
-    if (r.life < 0.6) r.actor.object.visible = Math.random() < r.life / 0.6;
     r.actor.update(dt);
   }
   rushers = rushers.filter((r) => {
     if (r.life > 0) return true;
-    scene.remove(r.actor.object);
+    // Made it: stay as a regular patron while there's room, otherwise slip away unseen.
+    if (npcs.length < CONFIG.maxCharacters - 1) {
+      const n = addNpc(r.actor, { kind: "crowd", name: "Someone from the stall", at: [r.x, r.z], wander: 2.5 });
+      n.fromStall = true;
+    } else if (dist(r) < 14) { r.life = 0.5; return true; }
+    else scene.remove(r.actor.object);
     return false;
   });
+  // The soda turns up once the stall is empty.
+  if (state.stall === "open" && !state.sodaAt && !soda.object.visible &&
+      rushers.every((r) => r.delay <= 0 && Math.hypot(r.x - ix, r.z - iz) > 1.6)) {
+    state.sodaAt = [ix, iz];
+    soda.object.position.set(ix, world.floorY, iz);
+    soda.object.visible = true;
+  }
+}
+
+// ---------- Community Strap's black hole ----------
+// One frame of the hole opening at her crotch and pulling victim n in, t seconds in.
+// Returns true when it's over (the hole has closed and they're gone).
+function suckFrame(n, from, t, dt) {
+  // Nudged toward the victim so it sits in front of her.
+  const dx = from[0] - strap.x, dz = from[1] - strap.z, dl = Math.hypot(dx, dz) || 1;
+  const hx = strap.x + dx / dl * 0.15, hz = strap.z + dz / dl * 0.15, hy = world.floorY + 0.62;
+  const open = Math.min(1, t / 0.4), close = t > 1.8 ? Math.max(0, 1 - (t - 1.8) / 0.4) : 1;
+  hole.visible = true;
+  hole.position.set(hx, hy, hz);
+  hole.scale.setScalar(0.15 + 2.6 * open * close);
+  vortex.update(dt);
+  const pull = Math.min(1, Math.max(0, (t - 0.3) / 1.2));
+  n.x = from[0] + (hx - from[0]) * pull;
+  n.z = from[1] + (hz - from[1]) * pull;
+  n.actor.object.position.set(n.x, world.floorY, n.z);
+  n.actor.object.scale.copy(n.baseScale).multiplyScalar(Math.max(0.01, 1 - pull));
+  if (n.actor.object.material) n.actor.object.material.rotation += dt * 12 * pull;
+  if (t <= 2.2) return false;
+  hole.visible = false;
+  return true;
+}
+
+// ---------- The intro: Sock confronts Community Strap ----------
+// Plays while the camera is on her, so a first-time player sees what the black hole is.
+function sockScene(done) {
+  const look = extraLooks[Math.floor(Math.random() * extraLooks.length)];
+  const actor = makeActor(look);
+  // Start a few metres to one side of her so they walk across the shot.
+  const p = state.player, vx = strap.x - p.x, vz = strap.z - p.z, vl = Math.hypot(vx, vz) || 1;
+  let start = null;
+  for (const side of [1, -1]) for (const off of [4, 3, 2.2]) {
+    const x = strap.x - vz / vl * off * side - vx / vl * 1.2, z = strap.z + vx / vl * off * side - vz / vl * 1.2;
+    if (!start && world.canNav(x, z) && world.clearLine(x, z, strap.x, strap.z)) start = [x, z];
+  }
+  start = start || [strap.x - vx / vl * 2.5, strap.z - vz / vl * 2.5];
+  const sock = { actor, name: "Sock", x: start[0], z: start[1], baseScale: actor.object.scale.clone() };
+  scene.add(actor.object);
+  state.fovTarget = 24;          // close in on the two of them
+  state.sock = { n: sock, stage: "walk", t: 0, done };
+}
+
+function updateSock(dt) {
+  const s = state.sock, n = s.n;
+  s.t += dt;
+  if (s.stage === "walk") {
+    const arrived = Math.hypot(n.x - strap.x, n.z - strap.z) < 1.3 || moveToward(n, strap.x, strap.z, 1.6, dt) || s.t > 6;
+    n.actor.face(strap.x, strap.z);
+    n.actor.object.position.set(n.x, world.floorY, n.z);
+    n.actor.update(dt);
+    if (arrived) {
+      s.stage = "talk"; s.t = 0;
+      showToast("Sock", dialogue.sock || "How you gonna ghost me and then pull up to my DJ set?");
+    }
+  } else if (s.stage === "talk") {
+    n.actor.face(strap.x, strap.z);
+    n.actor.update(dt);
+    if (s.t > 3.2) { s.stage = "hole"; s.t = 0; s.from = [n.x, n.z]; hideToast(); }
+  } else if (suckFrame(n, s.from, s.t, dt)) {
+    scene.remove(n.actor.object);
+    state.sock = null;
+    setTimeout(s.done, 500);
+  }
 }
 
 // ---------- Patrons confronting Community Strap ----------
@@ -610,7 +686,8 @@ function updateAccost(dt) {
   if (!a) {
     // Faster when she's close to you, since that's when you need the help.
     state.accostTimer -= dt * (dist(strap) < 15 ? 2 : 1);
-    if (state.accostTimer <= 0) startAccost();
+    // Only when you can see her, so you actually watch it happen.
+    if (state.accostTimer <= 0 && dist(strap) < 24 && world.clearLine(state.player.x, state.player.z, strap.x, strap.z)) startAccost();
     return;
   }
   a.t += dt;
@@ -630,22 +707,7 @@ function updateAccost(dt) {
     a.from = [n.x, n.z];
     hole.visible = true;
   } else if (a.stage === "hole") {
-    // The hole opens at her crotch, pulls them in spinning, then closes.
-    // Sits at her crotch, nudged toward the victim so it's in front of her.
-    const dx = a.from[0] - strap.x, dz = a.from[1] - strap.z, dl = Math.hypot(dx, dz) || 1;
-    const hx = strap.x + dx / dl * 0.15, hz = strap.z + dz / dl * 0.15, hy = world.floorY + 0.62;
-    const open = Math.min(1, a.t / 0.4), close = a.t > 1.8 ? Math.max(0, 1 - (a.t - 1.8) / 0.4) : 1;
-    hole.position.set(hx, hy, hz);
-    hole.scale.setScalar(0.08 + 0.72 * open * close);
-    hole.material.rotation -= dt * 7;
-    const pull = Math.min(1, Math.max(0, (a.t - 0.3) / 1.2));
-    n.x = a.from[0] + (hx - a.from[0]) * pull;
-    n.z = a.from[1] + (hz - a.from[1]) * pull;
-    const sc = Math.max(0.01, 1 - pull);
-    n.actor.object.scale.copy(n.baseScale).multiplyScalar(sc);
-    if (n.actor.object.material) n.actor.object.material.rotation += dt * 12 * pull;
-    if (a.t > 2.2) {
-      hole.visible = false;
+    if (suckFrame(n, a.from, a.t, dt)) {
       scene.remove(n.actor.object);
       npcs = npcs.filter((m) => m !== n);
       state.accost = null;
@@ -801,6 +863,7 @@ function loop(now) {
     updateNpcs(dt, frozen || state.phase === "title");
     updateStrap(dt, frozen);
     updateRushers(dt);
+    if (state.sock) updateSock(dt);
     world.keyRoom.near(state.player.x, state.player.z);
     if (state.phase === "play" && !frozen) updateAccost(dt);
     key.update(dt);
@@ -819,4 +882,4 @@ load().catch((e) => { $("loading-text").textContent = "Couldn't load the game. R
 requestAnimationFrame(loop);
 
 // Test builds only (removed from the real build).
-if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
+if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { updateRushers, state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };

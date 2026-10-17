@@ -281,7 +281,7 @@ export class World {
 
     // One stall in the far corner, built like a giant low-poly bathroom cabinet:
     // trim cap on top, base strip, a panelled door with a brass knob.
-    const S = 2.0, sx0 = x1 - S, sz0 = z1 - S, doorW = 1.0, doorX = sx0 + 0.5;
+    const S = 2.6, sx0 = x1 - S, sz0 = z1 - S, doorW = 1.3, doorX = sx0 + 0.6;
     const stallH = 2.2, T = 0.08;
     const body = 0xf1ede4, trim = 0xfaf8f2, base = 0x8d8476, panel = 0xe3dccf, brass = 0xc9a14a;
     const at = (mesh, px, py, pz) => { mesh.position.set(px, py, pz); this.scene.add(mesh); return mesh; };

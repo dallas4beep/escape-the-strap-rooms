@@ -18,6 +18,7 @@ for (const raw of lines) {
   else if (section.startsWith("solo poly")) out.primary.push(text);
   else if (section.includes("djs")) (heading.includes("left") ? out.djLeft : out.djRight).push(text);
   else if (section.startsWith("crowd")) out.crowd.push(text);
+  else if (section.includes("sock")) out.sock = text;
   else if (section.includes("shout")) out.accost.push(text);
 }
 fs.writeFileSync(dst, JSON.stringify(out, null, 1));

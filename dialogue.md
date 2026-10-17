@@ -116,6 +116,12 @@ Each random character gets 2 of these.
 
 No lines. The texting video plays instead, and its texts are your opening lyrics.
 
+
+## Intro: Sock (confronts Community Strap, then gets sucked into the black hole)
+
+Plays right after the phone call video, while the camera is turned around on Community Strap.
+
+1. How you gonna ghost me and then pull up to my DJ set?
 ## What NPCs shout at Community Strap (right before the black hole)
 
 1. You broke my heart.

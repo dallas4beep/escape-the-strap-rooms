@@ -173,33 +173,3 @@ export function danceFloor(cols, rows) {
   update(0);
   return { texture: tex, update };
 }
-
-// Black hole: a dark core inside a swirling pink and purple ring.
-export function blackHole() {
-  const t = new THREE.CanvasTexture(canvas(256, 256, (g, W) => {
-    const c = W / 2;
-    const ring = g.createRadialGradient(c, c, 0, c, c, c);
-    ring.addColorStop(0, "rgba(0,0,0,1)");
-    ring.addColorStop(0.32, "rgba(0,0,0,1)");
-    ring.addColorStop(0.42, "rgba(255,112,166,0.95)");
-    ring.addColorStop(0.55, "rgba(140,60,220,0.7)");
-    ring.addColorStop(0.75, "rgba(60,20,90,0.35)");
-    ring.addColorStop(1, "rgba(0,0,0,0)");
-    g.fillStyle = ring;
-    g.fillRect(0, 0, W, W);
-    // Spiral arms so the spin is visible.
-    g.strokeStyle = "rgba(255,200,240,0.55)";
-    g.lineWidth = 3;
-    for (let arm = 0; arm < 4; arm++) {
-      g.beginPath();
-      for (let i = 0; i <= 40; i++) {
-        const r = c * (0.95 - i * 0.015), a = arm * Math.PI / 2 + i * 0.12;
-        const x = c + Math.cos(a) * r, y = c + Math.sin(a) * r;
-        i ? g.lineTo(x, y) : g.moveTo(x, y);
-      }
-      g.stroke();
-    }
-  }));
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
