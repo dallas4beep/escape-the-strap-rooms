@@ -1,0 +1,13 @@
+{
+  "name": "escape-the-strap-rooms",
+  "private": true,
+  "version": "2.0.0",
+  "scripts": {
+    "build": "node tools/build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0",
+    "gltfpack": "0.22.0",
+    "three": "0.170.0"
+  }
+}

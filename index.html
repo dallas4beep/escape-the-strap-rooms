@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#120a1f">
+    <title>Escape the Strap Rooms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="view"></div>
+
+    <div id="hud" class="hidden">
+        <div id="status"></div>
+    </div>
+    <div id="crosshair" class="hidden"></div>
+    <div id="toast" class="hidden"><span id="toast-name"></span><span id="toast-text"></span></div>
+
+    <div id="touch-controls">
+        <div id="look-zone"></div>
+        <div id="stick-base"><div id="stick-knob"></div></div>
+        <button id="act-btn" aria-label="Continue">&#9654;</button>
+    </div>
+
+    <div id="dialogue" class="hidden">
+        <div id="dialogue-name"></div>
+        <div id="dialogue-text"></div>
+        <div class="dialogue-hint"><span class="desktop-only">Space / E / click to continue</span><span class="touch-only-inline">Tap anywhere to continue</span></div>
+    </div>
+
+    <div id="video-layer" class="hidden">
+        <video id="video" playsinline webkit-playsinline preload="auto"></video>
+        <button id="video-close" class="hidden" aria-label="Close">&#10005;</button>
+    </div>
+
+    <div id="loading" class="screen">
+        <img class="logo" src="assets/img/logo.webp" alt="It's Community Strap">
+        <p id="loading-text">Loading 0%</p>
+    </div>
+
+    <div id="title" class="screen hidden">
+        <img class="logo" src="assets/img/logo.webp" alt="It's Community Strap">
+        <h1>ESCAPE THE STRAP ROOMS</h1>
+        <button id="start-btn">Start</button>
+        <button id="credits-btn" class="small">Credits</button>
+        <p class="touch-only small-print">Landscape works best.</p>
+    </div>
+
+    <div id="caught" class="screen hidden">
+        <h1>SHE CAUGHT YOU</h1>
+        <p>Eight hours of processing. Starting now.</p>
+        <button id="retry-btn">Try again</button>
+    </div>
+
+    <div id="won" class="screen hidden">
+        <h1>YOU ESCAPED</h1>
+        <p>No processing session tonight.</p>
+        <button id="again-btn">Play again</button>
+    </div>
+
+    <div id="credits" class="screen hidden">
+        <h1>CREDITS</h1>
+        <div id="credits-list"></div>
+        <button id="credits-close">Back</button>
+    </div>
+
+    <noscript>This game needs JavaScript.</noscript>
+    <script src="game.js"></script>
+</body>
+</html>
