@@ -10,7 +10,6 @@ export const input = {
   lookY: 0,
   enabled: false,            // movement and looking
   pointerLocked: false,
-  mouseX: null,
   onTap: null,               // called on any tap/click/space while a conversation is open
 };
 
@@ -33,10 +32,9 @@ export function setupInput(canvas) {
   window.addEventListener("blur", () => { for (const k in input.keys) input.keys[k] = false; releaseAll(); });
 
   document.addEventListener("pointerlockchange", () => { input.pointerLocked = document.pointerLockElement === canvas; });
-  // Mouse look works three ways, so it works on every browser:
+  // Mouse look works two ways, so it works on every browser:
   // 1. click once to lock the mouse, then just move it;
-  // 2. hold the button and drag;
-  // 3. rest the pointer near the left or right edge of the screen to keep turning.
+  // 2. hold the button and drag.
   let lastX = null, lastY = null;
   document.addEventListener("mousemove", (e) => {
     if (!input.enabled || document.body.classList.contains("touch")) { lastX = null; return; }
@@ -47,13 +45,11 @@ export function setupInput(canvas) {
     }
     lastX = e.clientX;
     lastY = e.clientY;
-    input.mouseX = e.clientX;
     if (input.pointerLocked || (e.buttons & 1)) {
       input.lookX += mx * CONFIG.mouseSensitivity;
       input.lookY -= my * CONFIG.mouseSensitivity;
     }
   });
-  document.addEventListener("mouseleave", () => { input.mouseX = null; });
   canvas.addEventListener("click", () => {
     if (input.onTap) { input.onTap(); return; }
     if (input.enabled && !input.pointerLocked && !document.body.classList.contains("touch")) lockPointer(canvas);
@@ -164,11 +160,5 @@ export function moveAxes() {
   let turn = 0;
   if (k.ArrowLeft) turn -= 1;
   if (k.ArrowRight) turn += 1;
-  // Edge turning when the mouse isn't locked.
-  if (!input.pointerLocked && input.mouseX != null && !document.body.classList.contains("touch")) {
-    const edge = window.innerWidth * 0.12;
-    if (input.mouseX < edge) turn -= 1 - input.mouseX / edge;
-    else if (input.mouseX > window.innerWidth - edge) turn += 1 - (window.innerWidth - input.mouseX) / edge;
-  }
   return { fwd, strafe, turn };
 }
