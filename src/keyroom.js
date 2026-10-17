@@ -148,7 +148,7 @@ function neonSign() {
   g.shadowColor = "#ff4fa3";
   g.shadowBlur = 22;
   g.fillStyle = "#ffd1e8";
-  g.fillText("CARABINER \u2192", 256, 78);
+  g.fillText("GIRL TRASH", 256, 78);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return t;

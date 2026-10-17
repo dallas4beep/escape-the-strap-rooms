@@ -4,6 +4,8 @@ import * as THREE from "three";
 import { CONFIG, SPOTS } from "./config.js";
 import * as paint from "./paint.js";
 import { buildKeyRoom } from "./keyroom.js";
+import { clubify, clubTime, clubTex, clubHole, neonStrips } from "./clublook.js";
+import { buildMushroom, mushroomTextures } from "./mushroom.js";
 
 const WALL_H = 2.45;
 
@@ -50,6 +52,7 @@ export class World {
         opacity: see ? 0.6 : 1,
         depthWrite: !see,
       });
+      clubify(o.material, name);
     });
     gltf.scene.scale.set(k, 1, k);
     this.scene.add(gltf.scene);
@@ -62,6 +65,14 @@ export class World {
     this.buildDJBooth();
     this.buildBathroom();
     this.keyRoom = buildKeyRoom(this);
+    await buildMushroom(this, gltfLoader, texLoader);
+    const mt = mushroomTextures(texLoader);
+    clubTex.wall.value = mt.wall;
+    clubTex.floor.value = mt.floor;
+    const m = SPOTS.mushroom.pos, r = SPOTS.mushroom.hole;
+    clubHole.value.set(m[0], m[1], r);
+    neonStrips(this, [SPOTS.bathroom, SPOTS.keyRoom, { min: [m[0] - r, m[1] - r], max: [m[0] + r, m[1] + r] }]);
+    this.updaters.push((t) => { clubTime.value = t; });
 
     this.walk = this.dilate(0.25);     // player clearance
     this.nav = this.dilate(0.32);      // NPC and Community Strap clearance
@@ -173,48 +184,6 @@ export class World {
     if (best < 0) return null;
     const g = this.grid;
     return [g.originX + (bx + 0.5) * this.nCell, g.originZ + (bz + 0.5) * this.nCell];
-  }
-
-  // Glowing floor arrows along the walking route from (ax, az) to (bx, bz).
-  guideArrows(ax, az, bx, bz) {
-    const field = new Int32Array(this.nW * this.nH);
-    this.updateFlow(bx, bz, field);
-    const pts = [[ax, az]];
-    let x = ax, z = az;
-    for (let i = 0; i < 5000; i++) {
-      const s = this.flowStep(x, z, field);
-      if (!s || (s[0] === x && s[1] === z)) break;
-      [x, z] = s;
-      pts.push(s);
-    }
-    const c = document.createElement("canvas");
-    c.width = c.height = 128;
-    const g = c.getContext("2d");
-    g.shadowColor = "#ff4fa3";
-    g.shadowBlur = 16;
-    g.strokeStyle = "#ffc2e0";
-    g.lineWidth = 16;
-    g.lineCap = g.lineJoin = "round";
-    for (const y0 of [70, 104]) { g.beginPath(); g.moveTo(26, y0); g.lineTo(64, y0 - 44); g.lineTo(102, y0); g.stroke(); }
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-    const geo = new THREE.PlaneGeometry(1.2, 1.2);
-    const group = new THREE.Group();
-    let run = 2.5;
-    for (let i = 1; i < pts.length - 4; i++) {
-      run += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
-      if (run < 4) continue;
-      run = 0;
-      const ahead = pts[Math.min(i + 4, pts.length - 1)], behind = pts[i - 1];
-      const m = new THREE.Mesh(geo, mat);
-      m.rotation.set(-Math.PI / 2, Math.atan2(-(ahead[0] - behind[0]), -(ahead[1] - behind[1])), 0, "YXZ");
-      m.position.set(pts[i][0], this.floorY + 0.03, pts[i][1]);
-      group.add(m);
-    }
-    this.scene.add(group);
-    this.updaters.push((t) => { mat.opacity = 0.8 + 0.2 * Math.sin(t * 4); });
-    return group;
   }
 
   // ---------- Club props ----------
