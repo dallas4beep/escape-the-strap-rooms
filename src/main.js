@@ -556,10 +556,12 @@ function inBathroom(p) {
   return p.x > b.min[0] && p.x < b.max[0] && p.z > b.min[1] && p.z < b.max[1];
 }
 
-// The door flies open and thirty people pour out and scatter across the club.
-// Once the last of them is out, the soda is left spinning inside the stall.
+// The door flies open and thirty people pour out and scatter across the club, and the
+// regulars in the bathroom bolt with them. Once the last of them is out of the stall,
+// the soda is left spinning inside it.
 function burstStall() {
   state.stall = "open";
+  state.stallOpenedAt = state.time;
   world.stall.open();
   const [ix, iz] = world.stall.inside;
   // Everywhere they could run to: open floor well away from the bathroom.
@@ -574,13 +576,22 @@ function burstStall() {
     actor.object.visible = false;
     scene.add(actor.object);
     rushers.push({
-      actor, goal, field: null,
+      actor, goal, field: null, stage: "exit",
       x: ix + rand(-0.4, 0.4), z: iz + rand(-0.4, 0.4),
       delay: i * 0.12,                         // they come out one after another
       life: 45,                                // in case someone gets stuck
       speed: rand(3.2, 4.4),
     });
   }
+  // Everyone else in the bathroom runs out too.
+  const B = SPOTS.bathroom;
+  const inside = npcs.filter((n) => n.kind === "crowd" && n.x > B.min[0] && n.x < B.max[0] && n.z > B.min[1] && n.z < B.max[1]);
+  inside.forEach((n, i) => {
+    const cell = spots[Math.floor(Math.random() * spots.length)];
+    const goal = [world.grid.originX + (cell % world.nW + 0.5) * world.nCell, world.grid.originZ + (((cell / world.nW) | 0) + 0.5) * world.nCell];
+    rushers.push({ actor: n.actor, goal, field: null, stage: "run", x: n.x, z: n.z, delay: 0.3 + i * 0.25, life: 45, speed: rand(3.2, 4.2) });
+  });
+  npcs = npcs.filter((n) => !inside.includes(n));
 }
 
 function updateRushers(dt) {
@@ -594,6 +605,16 @@ function updateRushers(dt) {
     }
     r.actor.object.visible = true;
     r.life -= dt;
+    if (r.stage === "exit") {
+      // Straight out through the stall door first, so nobody gets stuck on its edges.
+      const [fx, fz] = world.stall.front, tx = fx, tz = fz - 0.5;
+      const dx = tx - r.x, dz = tz - r.z, d = Math.hypot(dx, dz), step = Math.min(d, r.speed * dt);
+      if (d < 0.15) r.stage = "run";
+      else { r.x += dx / d * step; r.z += dz / d * step; r.actor.face(tx, tz); }
+      r.actor.object.position.set(r.x, world.floorY, r.z);
+      r.actor.update(dt);
+      continue;
+    }
     const step = world.flowStep(r.x, r.z, r.field);
     if (step && Math.hypot(r.goal[0] - r.x, r.goal[1] - r.z) > 0.6) {
       moveToward(r, step[0], step[1], r.speed, dt);
@@ -612,9 +633,9 @@ function updateRushers(dt) {
     else scene.remove(r.actor.object);
     return false;
   });
-  // The soda turns up once the stall is empty.
+  // The soda turns up once the stall is empty (or after 8 seconds, whatever happens).
   if (state.stall === "open" && !state.sodaAt && !soda.object.visible &&
-      rushers.every((r) => r.delay <= 0 && Math.hypot(r.x - ix, r.z - iz) > 1.6)) {
+      (rushers.every((r) => r.delay <= 0 && r.stage !== "exit") || state.time - state.stallOpenedAt > 8)) {
     state.sodaAt = [ix, iz];
     soda.object.position.set(ix, world.floorY, iz);
     soda.object.visible = true;
@@ -629,22 +650,42 @@ function suckFrame(n, from, t, dt) {
   // Nudged toward the victim so it sits in front of her.
   const dx = from[0] - strap.x, dz = from[1] - strap.z, dl = Math.hypot(dx, dz) || 1;
   const hx = strap.x + dx / dl * 0.15, hz = strap.z + dz / dl * 0.15, hy = world.floorY + 0.62;
-  const open = Math.min(1, t / 0.4), close = t > 1.8 ? Math.max(0, 1 - (t - 1.8) / 0.4) : 1;
+  const open = Math.min(1, t / 0.4), close = t > 1.85 ? Math.max(0, 1 - (t - 1.85) / 0.4) : 1;
   hole.visible = true;
+  hole.renderOrder = 5;
   hole.position.set(hx, hy, hz);
   hole.scale.setScalar(0.15 + 2.4 * open * close);
-  // Point the funnel's wide end at the victim, as seen from the camera.
-  const a = holeAim.set(hx, hy, hz).project(camera), b = victimAim.set(n.x, world.floorY + 0.9, n.z).project(camera);
+  // Point the funnel's wide end at where the victim started, as seen from the camera.
+  const a = holeAim.set(hx, hy, hz).project(camera), b = victimAim.set(from[0], world.floorY + 0.9, from[1]).project(camera);
   const sx = (b.x - a.x) * camera.aspect, sy = b.y - a.y;
   hole.material.rotation = Math.hypot(sx, sy) > 0.02 ? Math.atan2(sy, sx) - Math.PI / 2 : Math.PI;
   vortex.update(dt);
-  const pull = Math.min(1, Math.max(0, (t - 0.3) / 1.2));
-  n.x = from[0] + (hx - from[0]) * pull;
-  n.z = from[1] + (hz - from[1]) * pull;
-  n.actor.object.position.set(n.x, world.floorY, n.z);
-  n.actor.object.scale.copy(n.baseScale).multiplyScalar(Math.max(0.01, 1 - pull));
-  if (n.actor.object.material) n.actor.object.material.rotation += dt * 12 * pull;
-  if (t <= 2.2) return false;
+
+  // The victim is lifted off the floor and dragged down the funnel, faster and faster,
+  // spinning, stretched thin, until their middle disappears into the narrow end.
+  const o = n.actor.object, h = n.actor.height || 1.6;
+  const p = Math.min(1, Math.max(0, (t - 0.35) / 1.4)), e = p * p;
+  if (!n.sucking) {
+    n.sucking = true;
+    o.traverse((c) => { c.renderOrder = 10; });
+    if (o.isSprite) o.center.set(0.5, 0.5);   // spin around their middle, not their feet
+  }
+  n.x = from[0] + (hx - from[0]) * e;
+  n.z = from[1] + (hz - from[1]) * e;
+  const mid = world.floorY + h / 2 + (hy - world.floorY - h / 2) * e + Math.sin(t * 9) * 0.05 * (1 - e);
+  const size = Math.max(0.001, Math.pow(1 - e, 1.3)), thin = size * (1 - 0.55 * e), tall = size * (1 + 0.6 * e);
+  const spin = dt * (3 + 22 * e);
+  if (o.isSprite) {
+    o.position.set(n.x, mid, n.z);
+    o.scale.set(n.baseScale.x * thin, n.baseScale.y * tall, 1);
+    o.material.rotation += spin;
+  } else {
+    o.position.set(n.x, mid - (h * tall) / 2, n.z);
+    o.scale.set(n.baseScale.x * thin, n.baseScale.y * tall, n.baseScale.z * thin);
+    n.spinAngle = (n.spinAngle || o.rotation.y) + spin;   // facing code resets rotation each frame
+    o.rotation.y = n.spinAngle;
+  }
+  if (t <= 2.3) return false;
   hole.visible = false;
   return true;
 }
@@ -887,4 +928,4 @@ load().catch((e) => { $("loading-text").textContent = "Couldn't load the game. R
 requestAnimationFrame(loop);
 
 // Test builds only (removed from the real build).
-if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
+if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { updateRushers, state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
