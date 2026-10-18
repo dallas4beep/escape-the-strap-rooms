@@ -15,7 +15,8 @@ Each conversation shows 1 line. The next time you meet her, says something else.
 Name shown: "Black Solo Poly Hijabi Amputee"
 
 1. (GT) I'm in an open relationship with all of the population. Mostly myself tho. I'm kinda in a league of my own.
-2. Get a CLUE fr. No really I have a clue. I saw you drop your carabiner in the evil room. 
+2. Get a CLUE fr. No really I have a clue. I saw you drop your carabiner in the evil room.
+3. You dropped your shit when you were being nasty in the evil with the DJs in the room... And yall bitches call me messy.
 
 ## The two DJs
 
