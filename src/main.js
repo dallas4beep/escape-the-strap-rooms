@@ -320,6 +320,8 @@ function passedSock() {
 
 async function beginIntroLock() {
   state.phase = "lock";
+  // The way you were walking (snapped to the hallway), for when you get control back.
+  state.walkYaw = Math.round(state.player.yaw / (Math.PI / 2)) * (Math.PI / 2);
   input.enabled = false;
   releaseTouches();
   // A phone rings once, then the texts come up.
@@ -354,8 +356,9 @@ function beginPan() {
   state.fovTarget = 42;
   tweenCameraTo(strap.x, world.floorY + 1.3, strap.z, 1.8, () => sockScene(() => {
     setTimeout(() => {
-      // Face the exact opposite way: away from her.
-      const ax = p.x - (strap.x - p.x), az = p.z - (strap.z - p.z);
+      // Turn away from her and face straight down the hallway, the way you were walking,
+      // so you're not left staring into a wall.
+      const ax = p.x + Math.cos(state.walkYaw) * 10, az = p.z + Math.sin(state.walkYaw) * 10;
       state.fovTarget = CONFIG.fov;
       tweenCameraTo(ax, world.floorY + CONFIG.eyeHeight, az, 1.1, async () => {
         state.phase = "dangerVideo";
