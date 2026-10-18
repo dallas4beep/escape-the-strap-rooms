@@ -4,17 +4,18 @@ House style: direct and funny,
 Every line references Girl Trash lyrics, a lgbtq culture moment but isn't corny or dumb. DO not center WHITE LGBTQ refernces.
 No U-Hauls. Polyamory joke everywhere -- everyone is haveing some kind of issue with thier polycule.
 
-Each conversation shows 1 line. The next time you meet her, says something else.
+Each conversation shows 1 line. The next time you meet her, says something else.  Solo poly meme has an optional 2nd line (in every run)
+
 
 
 
 
 ## Solo poly meme (in every run)
 
-Name shown: "Her Own Primary"
+Name shown: "Black Solo Poly Hijabi Amputee"
 
-1. Solo poly means I'm my own primary. I take myself to every Chappell Roan show. I always get the good spot.
-2. (GT) I'm in an open relationship with all of the population. Mostly myself. I'm kinda in a league of my own.
+1. (GT) I'm in an open relationship with all of the population. Mostly myself tho. I'm kinda in a league of my own.
+2. Get a CLUE fr. No really I have a clue. I saw you drop your carabiner in the evil room. 
 
 ## The two DJs
 
