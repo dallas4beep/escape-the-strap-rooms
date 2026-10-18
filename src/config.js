@@ -73,6 +73,8 @@ export const SPOTS = {
   // and rises through a hole in the ceiling.
   mushroom: { pos: [-49.97, 10.94], yaw: 2.6, size: 2.5, hole: 6.3,
     room: { min: [-53.94, 7.0], max: [-46.0, 14.906] }, doorFrom: 10.0, doorTo: 11.875 },
+  // The dotted arrow on the middle hall's west wall, pointing at the archway into the west hall.
+  archArrow: [-53.925, -2.4375],
   keyRoom: { min: [-67.9, -4.25], max: [-61.4, 2.55], doorFrom: -1.45, doorTo: -0.35 },
   exitDoor: [-50.0, -4.1],
 

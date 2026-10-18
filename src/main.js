@@ -8,6 +8,7 @@ import * as A from "./actors.js";
 import { input, setupInput, lockPointer, unlockPointer, releaseTouches, moveAxes, isTouchDevice } from "./input.js";
 import * as audio from "./audio.js";
 import { createVortex } from "./vortex.js";
+import { dotArrow } from "./keyroom.js";
 import { protect } from "./protect.js";
 
 protect();
@@ -76,7 +77,7 @@ const state = {
   accost: null,               // the NPC storming up to Community Strap right now
 };
 let npcs = [], strap = null, key = null, soda = null, phoneGirl = null;
-let rushers = [], extraLooks = [], hole = null, vortex = null, makeActor = null;
+let rushers = [], extraLooks = [], hole = null, vortex = null, makeActor = null, archArrow = null;
 let dialogue = null, credits = null;
 
 // ---------- Loading ----------
@@ -155,6 +156,13 @@ async function load() {
   });
   // Everyone else, spread out through the rest of the club.
   for (const at of scatterSpots(scatter)) addNpc(next(), { kind: "crowd", name: "Patron", at, wander: 1.5 });
+
+  // The dotted arrow by the archway that leads through to the west hall and the Evil Room.
+  archArrow = dotArrow();
+  const arrowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.7), new THREE.MeshBasicMaterial({ map: archArrow.texture, transparent: true, fog: false }));
+  arrowMesh.rotation.y = Math.PI / 2;      // on the wall facing into the middle hall; points north at the arch
+  arrowMesh.position.set(SPOTS.archArrow[0], world.floorY + 1.45, SPOTS.archArrow[1]);
+  scene.add(arrowMesh);
 
   vortex = createVortex();
   hole = vortex.sprite;
@@ -1027,6 +1035,7 @@ function loop(now) {
     updateRushers(dt);
     if (state.sock) updateSock(dt);
     world.keyRoom.near(state.player.x, state.player.z);
+    if (Math.hypot(state.player.x - SPOTS.archArrow[0], state.player.z - SPOTS.archArrow[1]) < 30) archArrow.update(state.time);
     if (state.phase === "play" && !frozen) { updateAccost(dt); updateFeed(dt); }
     key.update(dt);
     soda.update(dt);

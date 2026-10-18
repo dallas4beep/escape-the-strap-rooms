@@ -233,9 +233,8 @@ function evilSign() {
 }
 
 // The loading-dots arrow: ten dots, a chevron and a tail, with white light running from
-// the tail to the tip every two seconds. Drawn pointing left, which on this wall is
-// toward the door.
-function dotArrow() {
+// the tail to the tip every two seconds. Points right, or left when flip is set.
+export function dotArrow(flip = false) {
   const W = 256, H = 128, c = document.createElement("canvas");
   c.width = W;
   c.height = H;
@@ -256,7 +255,7 @@ function dotArrow() {
       g.shadowBlur = 10 + 10 * p;
       g.fillStyle = col;
       g.beginPath();
-      g.arc(W / 2 - (x + 22.5) * k, H / 2 + (y - 25) * k, r, 0, Math.PI * 2);
+      g.arc(W / 2 + (flip ? -1 : 1) * (x + 22.5) * k, H / 2 + (y - 25) * k, r, 0, Math.PI * 2);
       g.fill();
     }
     texture.needsUpdate = true;
@@ -362,13 +361,7 @@ export function buildKeyRoom(world) {
   signMesh.rotation.y = Math.PI / 2;
   signMesh.position.set(x1 + 0.06, y + 1.38, R.doorTo + 1.6);
   scene.add(signMesh);
-  // A dotted arrow on the other side of the door, pointing at it.
-  const arrow = dotArrow();
-  const arrowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.7), new THREE.MeshBasicMaterial({ map: arrow.texture, transparent: true, fog: false }));
-  arrowMesh.rotation.y = Math.PI / 2;
-  arrowMesh.position.set(x1 + 0.06, y + 1.45, R.doorFrom - 1.2);
-  scene.add(arrowMesh);
-  world.updaters.push((time) => { if (wanted) { sign.update(time); arrow.update(time); } });
+  world.updaters.push((time) => { if (wanted) sign.update(time); });
 
   // A pool of light on the floor where the carabiner floats.
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2),
