@@ -11,12 +11,18 @@ for (const raw of lines) {
   const line = raw.trim();
   if (line.startsWith("## ")) { section = line.slice(3).toLowerCase(); who = ""; continue; }
   if (line.startsWith("### ")) { heading = line.slice(4); who = heading.replace(/\s*\(.*\)\s*$/, ""); continue; }
+  const shown = line.match(/^Name shown:\s*"(.+)"/);
+  if (shown && section.startsWith("solo poly")) { out.primaryName = shown[1]; continue; }
   const m = line.match(/^\d+\.\s+(?:\(GT\)\s*)?(.*)$/);
   if (!m) continue;
   const text = m[1];
   if (section.startsWith("named")) (out.named[who] ||= []).push(text);
   else if (section.startsWith("solo poly")) out.primary.push(text);
-  else if (section.includes("djs")) (heading.includes("left") ? out.djLeft : out.djRight).push(text);
+  else if (section.includes("djs")) {
+    const side = heading.includes("left") ? "Left" : "Right";
+    out["dj" + side].push(text);
+    if (who && who !== "DJ") out["dj" + side + "Name"] = who;   // the heading names the DJ
+  }
   else if (section.startsWith("crowd")) out.crowd.push(text);
   else if (section.includes("sock")) out.sock = text;
   else if (section.includes("vortex announcements")) (out.vortex ||= []).push(text);
