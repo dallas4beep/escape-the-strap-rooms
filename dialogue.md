@@ -22,12 +22,12 @@ Name shown: "Black Solo Poly Hijabi Amputee"
 
 No names. The dialogue box just says "DJ".
 
-### DJ (left deck)
+### PINKY HONEYCUTT (left deck)
 
 1. No requests. Unless it's SANTA'S COOKIES. Then fine, but everyone does the "Milky Cookie" dance.
 2. (GT) Raise your hand if your brain is fried!
 
-### DJ (right deck)
+### ARKESTRA (right deck)
 
 1. This whole set is songs that remind me of people who blocked me. So, mostly MUNA.
 2. (GT) I drop the Girl Trash remix the second Community Strap walks in. When you hear it, run.
