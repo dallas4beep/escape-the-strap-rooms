@@ -1,8 +1,8 @@
-// The Mushroom Dome Bar: a glowing domed bar room in the middle hall. It's walled in by
-// a round club wall with a doorway lined up with the dome's arch, so from the hall it
-// looks like any other room; inside, the dome rises through a hole in the ceiling. Its
-// own textures already glow, so it skips the club shader. The walls and the bar counter
-// are traced into the wall map so nobody walks through them.
+// The Mushroom Dome Bar: a glowing domed bar built into the south-west corner of the
+// middle hall. From the hall it's a wall with a doorway, like any other room; inside, the
+// dome rises through a hole in the ceiling. Its own textures already glow, so it skips the
+// club shader. The walls and the bar counter are traced into the wall map so nobody walks
+// through them.
 import * as THREE from "three";
 import { SPOTS } from "./config.js";
 import { clubify } from "./clublook.js";
@@ -37,23 +37,37 @@ export async function buildMushroom(world, gltfLoader, texLoader) {
   gltf.scene.position.set(cx, world.floorY + 0.045, cz);
   world.scene.add(gltf.scene);
 
-  // The round wall. Cylinder angles run x = sin(a), z = cos(a); the doorway faces +x.
-  const R = SPOTS.mushroom.hole + 0.1, gap = 0.5, door = Math.PI / 2, y = world.floorY;
+  // Close the corner into a room: a north wall, and an east wall with the doorway. The
+  // hall's own west and south walls make the other two sides.
+  const R = SPOTS.mushroom.room, M = SPOTS.mushroom, y = world.floorY;
+  const [x0, z0] = R.min, [x1, z1] = R.max, nz = z0 + 0.05, ex = x1 - 0.05;
   const wallMat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
   clubify(wallMat, "Wall_1");
-  const ring = (y0, h, start, len, mat, r = R) => {
-    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 72, 1, true, start, len), mat);
-    m.position.set(cx, y0 + h / 2, cz);
+  const pane = (w, h, px, py, pz, rotY) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), wallMat);
+    m.position.set(px, py, pz);
+    m.rotation.y = rotY;
     world.scene.add(m);
   };
-  ring(y, WALL_H, door + gap / 2, Math.PI * 2 - gap, wallMat);
-  ring(y + DOOR_H, WALL_H - DOOR_H, door - gap / 2, gap, wallMat);
-  // Neon along the bottom and top, like every other wall in the club.
-  ring(y + 0.04, 0.06, door + gap / 2, Math.PI * 2 - gap, new THREE.MeshBasicMaterial({ color: 0xff3d9a, side: THREE.DoubleSide, fog: false }), R + 0.03);
-  ring(y + 2.33, 0.05, door + gap / 2, Math.PI * 2 - gap, new THREE.MeshBasicMaterial({ color: 0x9b5cff, side: THREE.DoubleSide, fog: false }), R + 0.03);
-  for (let a = door + gap / 2; a < door + Math.PI * 2 - gap / 2; a += 0.05 / R) {
-    const x = cx + Math.sin(a) * R, z = cz + Math.cos(a) * R;
-    world.blockRect(x - 0.06, z - 0.06, x + 0.06, z + 0.06);
+  const strip = (len, h, py, color, px, pz, alongZ) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(alongZ ? 0.02 : len, h, alongZ ? len : 0.02),
+      new THREE.MeshBasicMaterial({ color, fog: false }));
+    m.position.set(px, py, pz);
+    world.scene.add(m);
+  };
+  const width = ex - x0, before = M.doorFrom - nz, after = z1 - M.doorTo, door = M.doorTo - M.doorFrom;
+  pane(width, WALL_H, x0 + width / 2, y + WALL_H / 2, nz, 0);
+  pane(before, WALL_H, ex, y + WALL_H / 2, nz + before / 2, Math.PI / 2);
+  pane(after, WALL_H, ex, y + WALL_H / 2, M.doorTo + after / 2, Math.PI / 2);
+  pane(door, WALL_H - DOOR_H, ex, y + (DOOR_H + WALL_H) / 2, M.doorFrom + door / 2, Math.PI / 2);
+  world.blockRect(x0, nz - 0.08, ex, nz + 0.08);
+  world.blockRect(ex - 0.08, nz, ex + 0.08, M.doorFrom);
+  world.blockRect(ex - 0.08, M.doorTo, ex + 0.08, z1);
+  // Neon along the outside, like every other wall in the club.
+  for (const [py, h, color] of [[y + 0.07, 0.06, 0xff3d9a], [y + 2.355, 0.05, 0x9b5cff]]) {
+    strip(width, h, py, color, x0 + width / 2, nz - 0.03, false);
+    strip(before, h, py, color, ex + 0.03, nz + before / 2, true);
+    strip(after, h, py, color, ex + 0.03, M.doorTo + after / 2, true);
   }
 
   const c = Math.cos(yaw), s = Math.sin(yaw);

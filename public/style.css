@@ -347,3 +347,19 @@ body.touch #toast { font-size: 14px; bottom: calc(16px + env(safe-area-inset-bot
 }
 body.touch #pop { font-size: 12px; max-width: 38vw; padding: 5px 8px; }
 @media (max-height: 500px) { #pop { font-size: 12px; padding: 5px 9px; } }
+
+/* Her Own Primary's "want a hint?" choice */
+#dialogue-choices { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+#dialogue-choices.hidden { display: none !important; }
+#dialogue-choices button {
+    font-family: inherit;
+    font-size: 16px;
+    padding: 8px 16px;
+    color: var(--paper);
+    background: var(--deep-plum);
+    border: 2px dashed var(--magenta);
+    box-shadow: 0 0 10px rgba(255, 112, 166, 0.45);
+    cursor: pointer;
+}
+#dialogue-choices button:hover { background: var(--sunset-pink); color: var(--midnight); }
+#dialogue-choices span { font-size: 12px; opacity: 0.75; }

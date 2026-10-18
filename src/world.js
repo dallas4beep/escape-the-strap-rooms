@@ -71,7 +71,7 @@ export class World {
     clubTex.floor.value = mt.floor;
     const m = SPOTS.mushroom.pos, r = SPOTS.mushroom.hole;
     clubHole.value.set(m[0], m[1], r);
-    neonStrips(this, [SPOTS.bathroom, SPOTS.keyRoom, { min: [m[0] - r, m[1] - r], max: [m[0] + r, m[1] + r] }]);
+    neonStrips(this, [SPOTS.bathroom, SPOTS.keyRoom, SPOTS.mushroom.room]);
     this.updaters.push((t) => { clubTime.value = t; });
 
     this.walk = this.dilate(0.25);     // player clearance

@@ -138,7 +138,9 @@ async function load() {
   SPOTS.djs.forEach((at, i) => addNpc(next(), { kind: "dj", name: "DJ", at, wander: 0, lines: i ? dialogue.djRight : dialogue.djLeft, talkRange: 1.9 }));
   // The old named regulars' spots are just patrons now, using the crowd lines.
   for (const at of Object.values(SPOTS.named)) addNpc(next(), { kind: "crowd", name: "Patron", at, wander: 1.2 });
-  addNpc(A.cardActor(fixed.primary, 1.5), { kind: "primary", name: "Her Own Primary", at: SPOTS.primary, wander: 0, lines: dialogue.primary });
+  // Her Own Primary always says her first two lines; her third is a hint, only if you ask.
+  const primary = addNpc(A.cardActor(fixed.primary, 1.5), { kind: "primary", name: "Her Own Primary", at: SPOTS.primary, wander: 0, lines: dialogue.primary.slice(0, 2) });
+  primary.hint = dialogue.primary[2] || "";
   const df = SPOTS.danceFloor;
   for (let i = 0; i < CONFIG.danceCrowd; i++) addNpc(next(), { kind: "crowd", name: "Someone on the dance floor", area: { min: [df.min[0] + 0.6, df.min[1] + 1.2], max: [df.max[0] - 0.6, df.max[1] - 0.4] } });
   const b = SPOTS.bathroom;
@@ -540,6 +542,7 @@ function updateNpcs(dt, frozen) {
 // ---------- Dialogue ----------
 function startTalk(n) {
   state.dialogue = { npc: n, pages: 1 };   // one line per chat; next time, the next line
+  if (n.hint) { n.lineIndex = 0; state.dialogue.pages = 2; state.dialogue.offerHint = true; }
   document.body.classList.add("talking");
   input.onTap = advanceTalk;
   releaseTouches();
@@ -559,6 +562,9 @@ function advanceTalk() {
   const d = state.dialogue;
   if (!d) return;
   if (--d.pages > 0 && d.npc.lines.length > 1) { showLine(d.npc); return; }
+  // After her two lines: ask whether you want the hint.
+  if (d.offerHint && !d.choosing) { d.choosing = true; $("dialogue-choices").classList.remove("hidden"); return; }
+  $("dialogue-choices").classList.add("hidden");
   const n = d.npc;
   n.cooldown = CONFIG.talkCooldown;
   if (n.kind === "named") n.followTimer = CONFIG.followTime;
@@ -569,6 +575,19 @@ function advanceTalk() {
   $("dialogue").classList.add("hidden");
 }
 $("dialogue").addEventListener("click", (e) => { e.stopPropagation(); advanceTalk(); });
+
+// Her Own Primary's hint, only when asked for.
+function giveHint() {
+  const d = state.dialogue;
+  if (!d || !d.choosing) return;
+  d.choosing = false;
+  d.offerHint = false;
+  $("dialogue-choices").classList.add("hidden");
+  $("dialogue-text").textContent = d.npc.hint;
+}
+$("ask-hint").addEventListener("click", (e) => { e.stopPropagation(); giveHint(); });
+$("no-hint").addEventListener("click", (e) => { e.stopPropagation(); advanceTalk(); });
+document.addEventListener("keydown", (e) => { if (e.code === "KeyH" && !e.repeat) giveHint(); });
 
 // ---------- Community Strap ----------
 function updateStrap(dt, frozen) {

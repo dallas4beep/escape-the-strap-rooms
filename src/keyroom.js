@@ -232,6 +232,39 @@ function evilSign() {
   return { texture, update };
 }
 
+// The loading-dots arrow: ten dots, a chevron and a tail, with white light running from
+// the tail to the tip every two seconds. Drawn pointing left, which on this wall is
+// toward the door.
+function dotArrow() {
+  const W = 256, H = 128, c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const g = c.getContext("2d");
+  // [x, y, delay] from the original, pointing right; mirrored below.
+  const dots = [[0, 0, 0.9], [18, 13, 1.1], [35, 25, 1.3], [18, 38, 1.1], [0, 50, 0.9],
+    [0, 25, 0.9], [-20, 25, 0.7], [-40, 25, 0.5], [-60, 25, 0.3], [-80, 25, 0.1]];
+  const k = 1.75, r = 7.5 * k * 0.95;
+  const texture = new THREE.CanvasTexture(c);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  function update(time) {
+    g.clearRect(0, 0, W, H);
+    for (const [x, y, delay] of dots) {
+      const t = (((time - delay) % 2) + 2) % 2;
+      const p = 0.5 - 0.5 * Math.cos(Math.PI * t);         // green -> white -> green
+      const col = `rgb(${Math.round(63 + 192 * p)},${Math.round(195 + 60 * p)},${Math.round(128 + 127 * p)})`;
+      g.shadowColor = col;
+      g.shadowBlur = 10 + 10 * p;
+      g.fillStyle = col;
+      g.beginPath();
+      g.arc(W / 2 - (x + 22.5) * k, H / 2 + (y - 25) * k, r, 0, Math.PI * 2);
+      g.fill();
+    }
+    texture.needsUpdate = true;
+  }
+  update(0);
+  return { texture, update };
+}
+
 function glowTexture() {
   const c = document.createElement("canvas");
   c.width = c.height = 128;
@@ -329,7 +362,13 @@ export function buildKeyRoom(world) {
   signMesh.rotation.y = Math.PI / 2;
   signMesh.position.set(x1 + 0.06, y + 1.38, R.doorTo + 1.6);
   scene.add(signMesh);
-  world.updaters.push((time) => { if (wanted) sign.update(time); });
+  // A dotted arrow on the other side of the door, pointing at it.
+  const arrow = dotArrow();
+  const arrowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.7), new THREE.MeshBasicMaterial({ map: arrow.texture, transparent: true, fog: false }));
+  arrowMesh.rotation.y = Math.PI / 2;
+  arrowMesh.position.set(x1 + 0.06, y + 1.45, R.doorFrom - 1.2);
+  scene.add(arrowMesh);
+  world.updaters.push((time) => { if (wanted) { sign.update(time); arrow.update(time); } });
 
   // A pool of light on the floor where the carabiner floats.
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2),
