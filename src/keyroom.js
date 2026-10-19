@@ -361,7 +361,13 @@ export function buildKeyRoom(world) {
   signMesh.rotation.y = Math.PI / 2;
   signMesh.position.set(x1 + 0.06, y + 1.38, R.doorTo + 1.6);
   scene.add(signMesh);
-  world.updaters.push((time) => { if (wanted) sign.update(time); });
+  // A dotted arrow on the other side of the door, pointing at it.
+  const arrow = dotArrow(true);
+  const arrowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.7), new THREE.MeshBasicMaterial({ map: arrow.texture, transparent: true, fog: false }));
+  arrowMesh.rotation.y = Math.PI / 2;
+  arrowMesh.position.set(x1 + 0.06, y + 1.45, R.doorFrom - 1.2);
+  scene.add(arrowMesh);
+  world.updaters.push((time) => { if (wanted) { sign.update(time); arrow.update(time); } });
 
   // A pool of light on the floor where the carabiner floats.
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 3.2),

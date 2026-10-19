@@ -7,7 +7,7 @@ import * as THREE from "three";
 import { SPOTS } from "./config.js";
 import { clubify } from "./clublook.js";
 
-const WALL_H = 2.66;        // floor to ceiling in the middle hall
+const WALL_H = 2.9;         // a little past the middle hall's ceiling, so no light shows over the top
 const DOOR_H = 2.3;
 
 const DIR = "assets/models/mushroom/";
@@ -40,7 +40,8 @@ export async function buildMushroom(world, gltfLoader, texLoader) {
   // Close the corner into a room: a north wall, and an east wall with the doorway. The
   // hall's own west and south walls make the other two sides.
   const R = SPOTS.mushroom.room, M = SPOTS.mushroom, y = world.floorY;
-  const [x0, z0] = R.min, [x1, z1] = R.max, nz = z0 + 0.05, ex = x1 - 0.05;
+  // Both walls run a little into the hall's own walls so no slit shows at the corners.
+  const [x0, z0] = [R.min[0] - 0.6, R.min[1]], [x1, z1] = [R.max[0], R.max[1] + 0.25], nz = z0 + 0.05, ex = x1 - 0.05;
   const wallMat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
   clubify(wallMat, "Wall_1");
   const pane = (w, h, px, py, pz, rotY) => {

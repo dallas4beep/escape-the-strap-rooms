@@ -569,6 +569,8 @@ function showLine(n) {
 function advanceTalk() {
   const d = state.dialogue;
   if (!d) return;
+  // While she's asking, a tap, click or Space takes the hint. Only "Never mind" skips it.
+  if (d.choosing) { giveHint(); return; }
   if (--d.pages > 0 && d.npc.lines.length > 1) { showLine(d.npc); return; }
   // After her two lines: ask whether you want the hint.
   if (d.offerHint && !d.choosing) { d.choosing = true; $("dialogue-choices").classList.remove("hidden"); return; }
@@ -594,8 +596,21 @@ function giveHint() {
   $("dialogue-text").textContent = d.npc.hint;
 }
 $("ask-hint").addEventListener("click", (e) => { e.stopPropagation(); giveHint(); });
-$("no-hint").addEventListener("click", (e) => { e.stopPropagation(); advanceTalk(); });
-document.addEventListener("keydown", (e) => { if (e.code === "KeyH" && !e.repeat) giveHint(); });
+function skipHint() {
+  const d = state.dialogue;
+  if (!d || !d.choosing) return;
+  d.choosing = false;
+  d.offerHint = false;
+  advanceTalk();
+}
+$("no-hint").addEventListener("click", (e) => { e.stopPropagation(); skipHint(); });
+$("no-hint").addEventListener("pointerdown", (e) => e.stopPropagation());
+$("ask-hint").addEventListener("pointerdown", (e) => e.stopPropagation());
+document.addEventListener("keydown", (e) => {
+  if (e.repeat) return;
+  if (e.code === "KeyH") giveHint();
+  if (e.code === "KeyN" || e.code === "Escape") skipHint();
+});
 
 // ---------- Community Strap ----------
 function updateStrap(dt, frozen) {
@@ -1053,4 +1068,4 @@ load().catch((e) => { $("loading-text").textContent = "Couldn't load the game. R
 requestAnimationFrame(loop);
 
 // Test builds only (removed from the real build).
-if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, beginIntroLock, beginPan, endRun };
+if (typeof TEST_HOOKS !== "undefined" && TEST_HOOKS) window.__t = { state, world, get npcs() { return npcs; }, get rushers() { return rushers; }, get soda() { return soda; }, burstStall, startAccost, get strap() { return strap; }, get phoneGirl() { return phoneGirl; }, SPOTS, CONFIG, camera, scene, beginIntroLock, beginPan, endRun };
